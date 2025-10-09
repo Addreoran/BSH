@@ -31,7 +31,7 @@ def main(out_file, in_folder, preffix_files):
                     else:
                         res[file_name][line[1]].add(line[0])
                     genes.add(line[1])
-            res[file_name]={i:len(j) for i,j in res[file_name]}
+            res[file_name]={i:len(j) for i,j in res[file_name].items()}
         for gene in list(genes):
             f.write(f"{str(gene)};")
             for file_name in file_list:
