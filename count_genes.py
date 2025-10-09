@@ -5,19 +5,25 @@ import numpy as np
 
 
 @click.command()
-@click.option('--in_folder', default=1, help='Number of greetings.')
-@click.option('--out_file', default=1, help='Number of greetings.')
-@click.option('--preffix_files', default=1, help='Number of greetings.')
+@click.option('--in_folder', default="./", help='Folder with BLAST files.')
+@click.option('--out_file', default="./", help='Out file with genes statistics.')
+@click.option('--preffix_files', default="./", help='Preffix of files to analyse.')
 def main(out_file, in_folder, preffix_files):
-    file_list = os.listdir(in_folder)
+    file_list = [i for i in os.listdir(in_folder) if i.startswith(preffix_files)]
     res = {}
     genes = set()
-
-    for file_name in file_list:
-        if file_name.startswith(preffix_files):
+    print("start")
+    #print(file_list)
+    with open(out_file, "w") as f: 
+        f.write("genes;")
+        f.write(";".join(file_list))
+        f.write("\n")
+        for e,file_name in enumerate(file_list):
+            print(e, file_name)
+            
             res[file_name] = {}
             path_to_csv = os.path.join(in_folder, file_name)
-            data = np.loadtext(path_to_csv, dtype=str, names=False)
+            data = np.loadtxt(path_to_csv, dtype=str)
             for line in data:
                 if float(line[2]) > 90 and float(line[10]) < 0.000001:
                     if line[1] not in res[file_name]:
@@ -25,13 +31,12 @@ def main(out_file, in_folder, preffix_files):
                     else:
                         res[file_name][line[1]].add(line[0])
                     genes.add(line[0])
-
-    with open(out_file, "w") as f:
-        f.write("genes;")
-        f.write(";".join(file_list))
-        f.write("\n")
+        
         for gene in list(genes):
             f.write(f"{str(gene)};")
             for file_name in file_list:
                 f.write(f"{str(res[file_name].get(gene, 0))};")
             f.write("\n")
+
+if __name__=='__main__':
+    main()
