@@ -68,7 +68,7 @@ def save_new_stats(merged_stats, out_file):
     file_list = list(merged_stats.keys())
     genes = set()
     for file, genes_data in merged_stats.items():
-        genes.union(set(genes_data.keys()))
+        genes = genes.union(set(genes_data.keys()))
     with open(out_file, "w") as f:
         f.write("genes;")
         f.write(";".join(file_list))
