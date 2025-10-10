@@ -48,17 +48,21 @@ def read_metabolites(count_metabolites_files):
             if l.strip():
                 line = l.strip().split(";")
                 probe_name = line[0]
-            res[probe_name] = {}
-            res[probe_name]["metabolites"] = {i: float(line[e + 1].replace(",", '.')) for e, i in enumerate(header)}
+                res[probe_name] = {}
+                #print(header)
+                #print(line)
+                res[probe_name]["metabolites"] = {i: line[e + 2].replace(",", '.') for e, i in enumerate(header)}
+            
     return res
 
 
 def select_files_of_metabolites(genes_counts, metabolites):
     for file, gene_data in genes_counts.items():
         # mgshot_S4358Nr27.1.fastq.gz.shotgun.tsv
-        file_name = file.split("_", 1)[1].split["."][0]
-        file_id = file.split("_", 1)[1].split["."][1]
-        if file.split("_", 1)[1].split["."][0] in metabolites:
+        print(file)
+        file_name = file.split("_", 1)[1].split(".")[0]
+        file_id = file.split("_", 1)[1].split(".")[1]
+        if file.split("_", 1)[1].split(".")[0] in metabolites:
             metabolites[file_name][file_id] = gene_data
     return metabolites
 
@@ -70,6 +74,7 @@ def count_pearson_corr(metabolites):
 
     for files, metabolites_data in metabolites.items():
         all_metabolites = all_metabolites.union(set(metabolites_data["metabolites"].keys()))
+        print(metabolites_data.keys())
         all_genes = all_genes.union(set(metabolites_data["1"].keys()))
         all_genes = all_genes.union(set(metabolites_data["2"].keys()))
         all_files.add(files)
