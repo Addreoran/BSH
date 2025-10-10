@@ -49,14 +49,16 @@ def merge_by_clusters(clusters, stats_file):
         new_stats = {}
         stats_file_tmp[file] = {}
         for cluster, proteins_in_cl in clusters.items():
+            proteins_in_cl = list(proteins_in_cl)
             if len(proteins_in_cl) == 1:
-                new_stats = genes_data
+                new_stats[proteins_in_cl[0]] = genes_data[proteins_in_cl[0]]
             else:
                 for prot in proteins_in_cl:
-                    if f"cluster_{cluster}" not in new_stats:
-                        new_stats[f"cluster_{cluster}"] = stats_file[file][prot]
-                    else:
-                        new_stats[f"cluster_{cluster}"] += stats_file[file][prot]
+                    if prot in stats_file[file]:
+                        if f"cluster_{cluster}" not in new_stats:
+                            new_stats[f"cluster_{cluster}"] = genes_data[prot]
+                        else:
+                            new_stats[f"cluster_{cluster}"] += genes_data[prot]
         stats_file_tmp[file] = new_stats
     return stats_file_tmp
 
