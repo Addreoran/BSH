@@ -19,7 +19,7 @@ def read_stats_file(count_genes_file):
                     gene = line[0]
                     genes_no = line[1:]
                     for e, file in enumerate(file_names):
-                        stats[file][gene] = int(genes_no[e])
+                        stats[file][gene] = float(genes_no[e])
     return stats
 
 
