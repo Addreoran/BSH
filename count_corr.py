@@ -49,10 +49,13 @@ def read_metabolites(count_metabolites_files):
                 line = l.strip().split(";")
                 probe_name = line[0]
                 res[probe_name] = {}
-                #print(header)
-                #print(line)
-                res[probe_name]["metabolites"] = {i: line[e + 2].replace(",", '.') for e, i in enumerate(header)}
-            
+                res[probe_name]["metabolites"] = {}
+                for e, i in enumerate(header):
+                    if line[e + 2]:
+                        res[probe_name]["metabolites"][i] = line[e + 2].replace(",", '.')
+                    else:
+                        res[probe_name]["metabolites"][i] = None
+
     return res
 
 
@@ -62,7 +65,8 @@ def select_files_of_metabolites(genes_counts, metabolites):
         print(file)
         file_name = file.split("_", 1)[1].split(".")[0]
         file_id = file.split("_", 1)[1].split(".")[1]
-        if file.split("_", 1)[1].split(".")[0] in metabolites:
+        print(file_name, file_id, file_name in metabolites)
+        if file_name in metabolites:
             metabolites[file_name][file_id] = gene_data
     return metabolites
 
