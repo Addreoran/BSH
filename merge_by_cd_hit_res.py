@@ -51,7 +51,8 @@ def merge_by_clusters(clusters, stats_file):
         for cluster, proteins_in_cl in clusters.items():
             proteins_in_cl = list(proteins_in_cl)
             if len(proteins_in_cl) == 1:
-                new_stats[proteins_in_cl[0]] = genes_data[proteins_in_cl[0]]
+                if proteins_in_cl[0] in new_stats:
+                    new_stats[proteins_in_cl[0]] = genes_data[proteins_in_cl[0]]
             else:
                 for prot in proteins_in_cl:
                     if prot in stats_file[file]:
