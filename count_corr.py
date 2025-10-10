@@ -49,7 +49,7 @@ def read_metabolites(count_metabolites_files):
                 line = l.strip().split(";")
                 probe_name = line[0]
             res[probe_name] = {}
-            res[probe_name]["metabolites"] = {i: float(line[e + 2].replace(",", '.')) for e, i in enumerate(header)}
+            res[probe_name]["metabolites"] = {i: float(line[e + 1].replace(",", '.')) for e, i in enumerate(header)}
     return res
 
 
