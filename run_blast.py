@@ -78,6 +78,7 @@ def run_blast(clusters_file, representatives_of_clusters, cluster_representative
     proteins = read_representative_fasta(representatives_of_clusters)
     new_proteins = update_proteins_names(proteins, clusters)
     save_clusters_representatives(cluster_representatives_file, new_proteins)
+    blast(cluster_representatives_file)
 
 
 if __name__ == "__main__":
