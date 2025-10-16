@@ -62,7 +62,7 @@ def blast(new_proteins):
         request = {
             "CMD": "Put",
             "PROGRAM": "blastp",
-            "DATABASE": "",
+            "DATABASE": "core_nt",
             "QUERY": protein
         }
         url = "https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi"
