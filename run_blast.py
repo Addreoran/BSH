@@ -44,7 +44,7 @@ def update_proteins_names(proteins, clusters):
     new_clusters = {}
     for cl_no, prot_id in clusters.items():
         old_header = proteins[prot_id]["header"]
-        new_header = old_header.replace(">", f">{cl_no}")
+        new_header = old_header.replace(">", f">{cl_no};")
         new_clusters[prot_id] = {"header": new_header, "seq": proteins[prot_id]["seq"]}
     return new_clusters
 
@@ -56,16 +56,18 @@ def save_clusters_representatives(file, new_proteins):
             f.write(prot_info["seq"])
 
 
-def blast(file):
-    request = {
-        "CMD": "Put",
-        "PROGRAM": "blastp",
-        "DATABASE": "",
-        "QUERY": open(file).read()
-    }
-    url = "https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi"
-    req = requests.post(url, data=request)
-    print(req.content)
+def blast(new_proteins):
+    for new_protein, new_protein_data in new_proteins.items():
+        protein = new_protein_data["header"] + new_protein_data["seq"]
+        request = {
+            "CMD": "Put",
+            "PROGRAM": "blastp",
+            "DATABASE": "",
+            "QUERY": protein
+        }
+        url = "https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi"
+        req = requests.post(url, data=request)
+        print(req.content)
 
 
 @click.command()
@@ -78,7 +80,7 @@ def run_blast(clusters_file, representatives_of_clusters, cluster_representative
     proteins = read_representative_fasta(representatives_of_clusters)
     new_proteins = update_proteins_names(proteins, clusters)
     save_clusters_representatives(cluster_representatives_file, new_proteins)
-    blast(cluster_representatives_file)
+    blast(new_proteins)
 
 
 if __name__ == "__main__":
