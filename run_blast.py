@@ -62,9 +62,15 @@ def blast(new_proteins, folder):
     if not os.path.exists(folder):
         os.mkdir(folder)
     new_proteins_no = len(new_proteins)
-    for new_protein, new_protein_data in new_proteins.items():
-        rids.append(blast_req(new_protein_data))
-        print(len(rids), new_proteins_no)
+    new_protein_data = list(new_proteins.values())
+    while new_protein_data:
+        new_protein_data_tmp = new_protein_data[:100]
+        new_protein_data = new_protein_data[100:]
+        protein = ''
+        for new_protein_info in new_protein_data_tmp:
+            protein += new_protein_info["header"] + new_protein_info["seq"]
+        rids.append(blast_req(protein))
+        print(len(rids), new_protein_data)
     NEW_RIDS = []
     e = 0
     with open("tmp.csv", "w") as f:
@@ -90,8 +96,7 @@ def blast(new_proteins, folder):
             e = 0
 
 
-def blast_req(new_protein_data):
-    protein = new_protein_data["header"] + new_protein_data["seq"]
+def blast_req(protein):
     request = {
         "CMD": "Put",
         "PROGRAM": "blastp",
