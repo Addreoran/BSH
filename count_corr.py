@@ -47,7 +47,7 @@ def read_metabolites(count_metabolites_files):
         for l in f:
             if l.strip():
                 line = l.strip().split(";")
-                probe_name = line[0]
+                probe_name = line[0].strip()
                 res[probe_name] = {}
                 res[probe_name]["metabolites"] = {}
                 for e, i in enumerate(header):
@@ -63,8 +63,8 @@ def select_files_of_metabolites(genes_counts, metabolites):
     for file, gene_data in genes_counts.items():
         # mgshot_S4358Nr27.1.fastq.gz.shotgun.tsv
         print(file)
-        file_name = file.split("_", 1)[1].split(".")[0]
-        file_id = file.split("_", 1)[1].split(".")[1]
+        file_name = file.split("_", 1)[1].split(".")[0].strip()
+        file_id = file.split("_", 1)[1].split(".")[1].strip()
         print(file_name, file_id, file_name in metabolites)
         if file_name in metabolites:
             metabolites[file_name][file_id] = gene_data
@@ -78,7 +78,7 @@ def count_pearson_corr(metabolites):
 
     for files, metabolites_data in metabolites.items():
         all_metabolites = all_metabolites.union(set(metabolites_data["metabolites"].keys()))
-        print(metabolites_data.keys())
+        #print(files, metabolites_data)
         all_genes = all_genes.union(set(metabolites_data["1"].keys()))
         all_genes = all_genes.union(set(metabolites_data["2"].keys()))
         all_files.add(files)
@@ -96,28 +96,42 @@ def count_pearson_corr(metabolites):
             genes_2[gene_name].append(gene_no)
     for metabolite, metabolites_sets in metabolites_sets.items():
         for gene_name, gene_sets in genes_1.items():
-            correlation = pearsonr(metabolites_sets, gene_sets)
-            tests[(metabolite, gene_name, 1)] = {"metabo_values": metabolites_sets, "gene_values": gene_sets,
-                                                 "pval": correlation.pvalue, "corr_value": correlation.statistics}
+            metabolites_list=[]
+            genes_no_list=[]
+            for e, gene_no in enumerate(gene_sets):
+                if metabolites_sets[e] is not None and gene_no is not None:
+                    metabolites_list.append(float(metabolites_sets[e]))
+                    genes_no_list.append(float(gene_no))
+            print(metabolites_list, genes_no_list)
+            correlation = pearsonr(metabolites_list, genes_no_list)
+            tests[(metabolite, gene_name, 1)] = {"metabo_values": metabolites_list, "gene_values": genes_no_list,
+                                                 "pval": correlation.pvalue, "corr_value": correlation.statistic}
         for gene_name, gene_sets in genes_2.items():
-            correlation = pearsonr(metabolites_sets, gene_sets)
-            tests[(metabolite, gene_name, 2)] = {"metabo_values": metabolites_sets, "gene_values": gene_sets,
-                                                 "pval": correlation.pvalue, "corr_value": correlation.statistics}
+            metabolites_list=[]
+            genes_no_list=[]
+            for e, gene_no in enumerate(gene_sets):
+                if metabolites_sets[e] is not None and gene_no is not None:
+                    metabolites_list.append(float(metabolites_sets[e]))
+                    genes_no_list.append(float(gene_no))
+            print(metabolites_list, genes_no_list)
+            correlation = pearsonr(metabolites_list, genes_no_list)
+            tests[(metabolite, gene_name, 2)] = {"metabo_values": metabolites_list, "gene_values": genes_no_list,
+                                                 "pval": correlation.pvalue, "corr_value": correlation.statistic}
     return tests
 
 
 def save_corr_stats(corr, out_file):
     with open(out_file, "w") as f:
         for datasets_info, datasets_data in corr.items():
-            f.write(';'.join(list(datasets_info)))
+            f.write(';'.join([str(i) for i in list(datasets_info)]))
             f.write(";")
             f.write(str(datasets_data['corr_value']))
             f.write(";")
             f.write(str(datasets_data['pval']))
             f.write(";")
-            f.write(','.join(datasets_data['metabo_values']))
+            f.write(','.join([str(i) for i in datasets_data['metabo_values']]))
             f.write(";")
-            f.write(','.join(datasets_data['gene_values']))
+            f.write(','.join([str(i) for i in datasets_data['gene_values']]))
             f.write("\n")
 
 
@@ -129,6 +143,17 @@ def count_corr(count_genes_file, out_file, count_metabolites_files):
     genes_counts = read_stats_file(count_genes_file)
     metabolites = read_metabolites(count_metabolites_files)
     genes_of_metabolites = select_files_of_metabolites(genes_counts, metabolites)
+    new_metabo={}
+    for file, metabo_data in genes_of_metabolites.items():
+        if len(metabo_data.keys())>1:
+            print(metabo_data.keys())
+            new_metabo[file]=metabo_data
+    genes_of_metabolites=new_metabo
+    #input()
+    #genes_of_metabolites = select_files_of_metabolites(genes_counts, metabolites)
+    #print(genes_of_metabolites.keys())
+    #print(genes_of_metabolites["S4358Nr1"])
+    #print(genes_counts)
     corr = count_pearson_corr(genes_of_metabolites)
     save_corr_stats(corr, out_file)
 
