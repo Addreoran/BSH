@@ -1,4 +1,5 @@
 import os
+import time
 
 import click
 import numpy as np
@@ -56,31 +57,59 @@ def save_clusters_representatives(file, new_proteins):
             f.write(prot_info["seq"])
 
 
-def blast(new_proteins):
+def blast(new_proteins, folder):
+    rids = []
+    if not os.path.exists(folder):
+        os.mkdir(folder)
     for new_protein, new_protein_data in new_proteins.items():
-        protein = new_protein_data["header"] + new_protein_data["seq"]
-        request = {
-            "CMD": "Put",
-            "PROGRAM": "blastp",
-            "DATABASE": "core_nt",
-            "QUERY": protein
-        }
-        url = "https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi"
-        req = requests.post(url, data=request)
-        print(req.content)
+        rids.append(blast_req(new_protein_data))
+    NEW_RIDS = []
+    e = 0
+    while rids:
+        URl = f"https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Get&FORMAT_OBJECT=SearchInfo&RID={rids[e]}"
+        req = requests.get(URl)
+        status = req.text.split("QBlastInfoBegin")[-1].split("QBlastInfoEnd")[0]
+        if status.splitlines()[1].split("=")[-1] == "yes":
+            url = f"https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Get&FORMAT_TYPE=Text&RID={rids[e]}"
+            req = requests.get(url)
+            with open(os.path.join(folder, rids[e], ".txt")) as f:
+                f.write(req.text)
+        else:
+            NEW_RIDS.append(rids[e])
+        if len(rids) < 10:
+            time.sleep(10)
+        e += 1
+        if len(rids) == e:
+            rids = NEW_RIDS
+            NEW_RIDS = []
+            e = 0
+
+
+def blast_req(new_protein_data):
+    protein = new_protein_data["header"] + new_protein_data["seq"]
+    request = {
+        "CMD": "Put",
+        "PROGRAM": "blastp",
+        "DATABASE": "core_nt",
+        "QUERY": protein
+    }
+    url = "https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi"
+    req = requests.post(url, data=request)
+    RID = req.text.split("QBlastInfoBegin")[1].split("QBlastInfoEnd")[0].splitlines()[1].split()[-1]
+    return RID
 
 
 @click.command()
 @click.option('--clusters_file', default="./", help='File with count of genes.')
 @click.option('--representatives_of_clusters', default="./", help='File with count of genes.')
 @click.option('--cluster_representatives_file', default="./", help='Out file with normalised genes statistics.')
-@click.option('--out_file', default="./", help='Out file with normalised genes statistics.')
-def run_blast(clusters_file, representatives_of_clusters, cluster_representatives_file, out_file):
+@click.option('--out_folder', default="./", help='Out file with normalised genes statistics.')
+def run_blast(clusters_file, representatives_of_clusters, cluster_representatives_file, out_folder):
     clusters = read_clusters_representatives(clusters_file)
     proteins = read_representative_fasta(representatives_of_clusters)
     new_proteins = update_proteins_names(proteins, clusters)
     save_clusters_representatives(cluster_representatives_file, new_proteins)
-    blast(new_proteins)
+    blast(new_proteins, out_folder)
 
 
 if __name__ == "__main__":
