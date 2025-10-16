@@ -61,7 +61,7 @@ def blast(file):
         "CMD": "Put",
         "PROGRAM": "blastp",
         "DATABASE": "",
-        "QUERY": file.open().read()
+        "QUERY": open(file).read()
     }
     url = "https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi"
     req = requests.post(url, data=request)
