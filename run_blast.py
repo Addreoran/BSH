@@ -61,8 +61,10 @@ def blast(new_proteins, folder):
     rids = []
     if not os.path.exists(folder):
         os.mkdir(folder)
+    new_proteins_no = len(new_proteins)
     for new_protein, new_protein_data in new_proteins.items():
         rids.append(blast_req(new_protein_data))
+        print(len(rids), new_proteins_no)
     NEW_RIDS = []
     e = 0
     with open("tmp.csv", "w") as f:
