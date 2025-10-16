@@ -65,6 +65,8 @@ def blast(new_proteins, folder):
         rids.append(blast_req(new_protein_data))
     NEW_RIDS = []
     e = 0
+    with open("tmp.csv", "w") as f:
+        f.write(",".join([str(i) for i in rids]))
     while rids:
         URl = f"https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Get&FORMAT_OBJECT=SearchInfo&RID={rids[e]}"
         req = requests.get(URl)
