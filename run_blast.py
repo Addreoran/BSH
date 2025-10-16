@@ -90,8 +90,9 @@ def blast_req(new_protein_data):
     request = {
         "CMD": "Put",
         "PROGRAM": "blastp",
-        "DATABASE": "core_nt",
-        "QUERY": protein
+        "DATABASE": "nr_cluster_seq",
+        "QUERY": protein,
+        "ALIGNMENTS": 1000
     }
     url = "https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi"
     req = requests.post(url, data=request)
