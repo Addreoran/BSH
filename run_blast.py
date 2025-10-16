@@ -70,7 +70,7 @@ def blast(new_proteins, folder):
         for new_protein_info in new_protein_data_tmp:
             protein += new_protein_info["header"] + new_protein_info["seq"]
         rids.append(blast_req(protein))
-        print(len(rids), new_protein_data)
+        print(len(rids), len(new_protein_data))
     NEW_RIDS = []
     e = 0
     with open("tmp.csv", "w") as f:
