@@ -85,6 +85,7 @@ def blast(new_proteins, folder):
         e += 1
         if len(rids) == e:
             rids = NEW_RIDS
+            print(len(rids))
             NEW_RIDS = []
             e = 0
 
