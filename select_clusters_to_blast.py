@@ -66,8 +66,8 @@ def blast(new_proteins, folder):
     new_proteins_no = len(new_proteins)
     new_protein_data = list(new_proteins.values())
     while new_protein_data:
-        new_protein_data_tmp = new_protein_data[:100]
-        new_protein_data = new_protein_data[100:]
+        new_protein_data_tmp = new_protein_data[:20]
+        new_protein_data = new_protein_data[20:]
         protein = ''
         for new_protein_info in new_protein_data_tmp:
             protein += new_protein_info["header"] + new_protein_info["seq"]
@@ -84,7 +84,7 @@ def blast(new_proteins, folder):
         if status.splitlines()[1].split("=")[-1] == "yes":
             url = f"https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Get&FORMAT_TYPE=Text&RID={rids[e]}"
             req = requests.get(url)
-            with open(os.path.join(folder, rids[e], ".txt")) as f:
+            with open(os.path.join(folder, f"{rids[e]}.txt")) as f:
                 f.write(req.text)
         else:
             NEW_RIDS.append(rids[e])
