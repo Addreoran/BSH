@@ -64,7 +64,7 @@ def read_blast_result(blast_table):
 def fix_corr(corr_info, blast_result, database_info):
     for cluster_no, metabolit_relation in corr_info.items():
         for metabolite, metabolite_cl_data in metabolit_relation.items():
-            if cluster_no in database_info:
+            if cluster_no in blast_result:
                 metabolite_cl_data["line"]+=f";{blast_result[cluster_no]['pident']}"
                 metabolite_cl_data["line"]+=f";{blast_result[cluster_no]['protein']}"
                 metabolite_cl_data["line"]+=f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
