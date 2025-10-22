@@ -24,8 +24,8 @@ def read_corr(corr_file):
                 
 
 def compare_cntrl_corr(corr_file, cntrl_corr_info):
-    for cluset_no, metabolit_relation in corr_file.items():
-        for metabolite, metabolite_cl_data in metabolit_relation.item():
+    for cluster_no, metabolit_relation in corr_file.items():
+        for metabolite, metabolite_cl_data in metabolit_relation.items():
             metabolite_cl_data["pval_cntrl"]=cntrl_corr_info[cluster_no][metabolite]["pval"]
             metabolite_cl_data["corr_cntrl"]=cntrl_corr_info[cluster_no][metabolite]["corr"]
     return corr_file
