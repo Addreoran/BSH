@@ -69,7 +69,7 @@ def fix_corr(corr_info, database_info):
                 metabolite_cl_data["line"]+=f";{database_info[cluster_no]['protein']}"
                 metabolite_cl_data["line"]+=f";{metabolite_cl_data['pval_cntrl']}"
                 metabolite_cl_data["line"]+=f";{metabolite_cl_data['corr_cntrl']}"
-    return corr_file
+    return corr_info
     
 def save_corr(fixed_corr, out_file):
     with open(out_file, "w") as f:
