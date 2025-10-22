@@ -43,11 +43,13 @@ def read_representative_fasta(file):
 
 def update_proteins_names(proteins, clusters):
     new_clusters = {}
+    representatives_of_clusters={}
     for cl_no, prot_id in clusters.items():
         old_header = proteins[prot_id]["header"]
         new_header = old_header.replace(">", f">{cl_no};")
         new_clusters[prot_id] = {"header": new_header, "seq": proteins[prot_id]["seq"]}
-    return new_clusters
+        representatives_of_clusters[cl_no] = {"header": new_header, "seq": proteins[prot_id]["seq"]}
+    return new_clusters, representatives_of_clusters
 
 
 def save_clusters_representatives(file, new_proteins):
@@ -109,18 +111,46 @@ def blast_req(protein):
     RID = req.text.split("QBlastInfoBegin")[1].split("QBlastInfoEnd")[0].splitlines()[1].split()[-1]
     return RID
 
+def read_corr_file(result, file):
+    with open(file) as f:
+        for l in f:
+            if l.strip():
+                line=l.strip().split(";")
+                pval=float(line[4])
+                cluster=line[1].split("_")[1]
+                if pval<0.05:
+                    result.add(cluster)
+    return result
+                
+
+def read_corr_files(files):
+    result=set()
+    for file in files:
+        result=read_corr_file(result, file)
+    return result
+
+def select_representative_significant_sequences(proteins_with_corr,new_proteins_by_clusters):
+    result={}
+    for cl in list(proteins_with_corr):
+        result[cl]=new_proteins_by_clusters[cl]
+    return result
 
 @click.command()
 @click.option('--clusters_file', default="./", help='File with count of genes.')
 @click.option('--representatives_of_clusters', default="./", help='File with count of genes.')
 @click.option('--cluster_representatives_file', default="./", help='Out file with normalised genes statistics.')
+@click.option('--cluster_representatives_with_corr_file', default="./", help='Out file with normalised genes statistics.')
 @click.option('--out_folder', default="./", help='Out file with normalised genes statistics.')
-def run_blast(clusters_file, representatives_of_clusters, cluster_representatives_file, out_folder):
+@click.option('--corr_files', default="./", help='Out file with normalised genes statistics.')
+def run_blast(clusters_file, representatives_of_clusters, cluster_representatives_file, out_folder, corr_files, cluster_representatives_with_corr_file):
     clusters = read_clusters_representatives(clusters_file)
     proteins = read_representative_fasta(representatives_of_clusters)
-    new_proteins = update_proteins_names(proteins, clusters)
+    new_proteins, new_proteins_by_clusters = update_proteins_names(proteins, clusters)
     save_clusters_representatives(cluster_representatives_file, new_proteins)
-    blast(new_proteins, out_folder)
+    proteins_with_corr = read_corr_files(corr_files.strip().split(','))
+    representative_significant_sequences=select_representative_significant_sequences(proteins_with_corr,new_proteins_by_clusters)
+    save_clusters_representatives(cluster_representatives_with_corr_file, representative_significant_sequences)
+    #blast(new_proteins, out_folder)
 
 
 if __name__ == "__main__":
