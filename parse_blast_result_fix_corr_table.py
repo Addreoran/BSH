@@ -64,10 +64,11 @@ def read_blast_result(blast_table):
 def fix_corr(corr_info, database_info):
     for cluster_no, metabolit_relation in corr_info.items():
         for metabolite, metabolite_cl_data in metabolit_relation.items():
-            metabolite_cl_data["line"]+=f";{database_info[cluster_no]['pident']}"
-            metabolite_cl_data["line"]+=f";{database_info[cluster_no]['protein']}"
-            metabolite_cl_data["line"]+=f";{metabolite_cl_data['pval_cntrl']}"
-            metabolite_cl_data["line"]+=f";{metabolite_cl_data['corr_cntrl']}"
+            if cluster_no in database_info:
+                metabolite_cl_data["line"]+=f";{database_info[cluster_no]['pident']}"
+                metabolite_cl_data["line"]+=f";{database_info[cluster_no]['protein']}"
+                metabolite_cl_data["line"]+=f";{metabolite_cl_data['pval_cntrl']}"
+                metabolite_cl_data["line"]+=f";{metabolite_cl_data['corr_cntrl']}"
     return corr_file
     
 def save_corr(fixed_corr, out_file):
