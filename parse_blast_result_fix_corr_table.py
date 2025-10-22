@@ -61,12 +61,14 @@ def read_blast_result(blast_table):
                     result[cl_no]={"pident":pident, "protein":protein}
     return result
     
-def fix_corr(corr_info, database_info):
+def fix_corr(corr_info, blast_result, database_info):
     for cluster_no, metabolit_relation in corr_info.items():
         for metabolite, metabolite_cl_data in metabolit_relation.items():
             if cluster_no in database_info:
-                metabolite_cl_data["line"]+=f";{database_info[cluster_no]['pident']}"
-                metabolite_cl_data["line"]+=f";{database_info[cluster_no]['protein']}"
+                metabolite_cl_data["line"]+=f";{blast_result[cluster_no]['pident']}"
+                metabolite_cl_data["line"]+=f";{blast_result[cluster_no]['protein']}"
+                metabolite_cl_data["line"]+=f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
+                metabolite_cl_data["line"]+=f";{database_info[blast_result[cluster_no]['protein']]['organism_name']}"
                 metabolite_cl_data["line"]+=f";{metabolite_cl_data['pval_cntrl']}"
                 metabolite_cl_data["line"]+=f";{metabolite_cl_data['corr_cntrl']}"
     return corr_info
@@ -90,7 +92,7 @@ def main(corr_file, corr_ctrl_file, blast_table, fasta_database, out_file):
     cntrl_corr_info = read_corr(corr_ctrl_file)
     blast_result = read_blast_result(blast_table)
     database_fasta_info = get_database_sequences_info(fasta_database)
-    fixed_corr = fix_corr(corr_info, database_fasta_info)
+    fixed_corr = fix_corr(corr_info, blast_result, database_fasta_info)
     save_corr(fixed_corr, out_file)
 
 
