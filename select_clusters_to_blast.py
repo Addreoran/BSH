@@ -150,7 +150,7 @@ def run_blast(clusters_file, representatives_of_clusters, cluster_representative
     proteins_with_corr = read_corr_files(corr_files.strip().split(','))
     representative_significant_sequences=select_representative_significant_sequences(proteins_with_corr,new_proteins_by_clusters)
     save_clusters_representatives(cluster_representatives_with_corr_file, representative_significant_sequences)
-    #blast(new_proteins, out_folder)
+    blast(new_proteins, out_folder)
 
 
 if __name__ == "__main__":
