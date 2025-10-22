@@ -150,7 +150,11 @@ def run_blast(clusters_file, representatives_of_clusters, cluster_representative
     proteins_with_corr = read_corr_files(corr_files.strip().split(','))
     representative_significant_sequences=select_representative_significant_sequences(proteins_with_corr,new_proteins_by_clusters)
     save_clusters_representatives(cluster_representatives_with_corr_file, representative_significant_sequences)
-    blast(representative_significant_sequences, out_folder)
+    #blast(representative_significant_sequences, out_folder)
+    # makeblastdb -in ./uniprotkb_ec_3_5_1_24_2025_10_22.fasta -dbtype prot
+    #  blastp -db ./uniprotkb_ec_3_5_1_24_2025_10_22.fasta -out ./3_5_1_24_proteins -query ./clusters_representatives_for_corr.fasta -num_threads 10 -outfmt 6 -evalue 0.01
+
+
 
 
 if __name__ == "__main__":
