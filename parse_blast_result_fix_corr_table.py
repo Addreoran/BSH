@@ -90,6 +90,7 @@ def save_corr(fixed_corr, out_file):
 def main(corr_file, corr_ctrl_file, blast_table, fasta_database, out_file):
     corr_info = read_corr(corr_file)
     cntrl_corr_info = read_corr(corr_ctrl_file)
+    corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
     blast_result = read_blast_result(blast_table)
     database_fasta_info = get_database_sequences_info(fasta_database)
     fixed_corr = fix_corr(corr_info, blast_result, database_fasta_info)
