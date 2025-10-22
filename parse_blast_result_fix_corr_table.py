@@ -54,7 +54,7 @@ def read_blast_result(blast_table):
                 protein=line[1].split("|")[1]
                 pident=float(line[2])
                 if cl_no in result:
-                    if result[cl_no]["pident"]>pident:
+                    if result[cl_no]["pident"]<pident:
                         result[cl_no]["pident"]=pident
                         result[cl_no]["protein"]=protein
                 else:
