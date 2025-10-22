@@ -74,7 +74,7 @@ def fix_corr(corr_info, database_info):
 def save_corr(fixed_corr, out_file):
     with open(out_file, "w") as f:
         for cluset_no, metabolit_relation in fixed_corr.items():
-            for metabolite, metabolite_cl_data in metabolit_relation.item():
+            for metabolite, metabolite_cl_data in metabolit_relation.items():
                 f.write(metabolite_cl_data["line"])
                 f.write("\n")
 
