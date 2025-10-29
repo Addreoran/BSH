@@ -119,7 +119,7 @@ def read_corr_file(result, file):
                 metabolite=line[0].strip()
                 pval=float(line[4])
                 cluster=line[1].split("_")[1]
-                if pval<0.05 and metabilite in {"Conc Cholic acid", "Conc Litocholic acid"}:
+                if pval<0.05 and metabolite in {"Conc Cholic acid", "Conc Litocholic acid"}:
                     result.add(cluster)
     return result
                 
