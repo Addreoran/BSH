@@ -52,9 +52,10 @@ def get_database_sequences_info(fasta_database):
                 result[uniprot_id]={"protein_name":protein_name, "organism_name":organism_name}
     return result
                 
-def read_blast_result(blast_table):
+def read_blast_result(blast_table, result=None):
     # 5857992;4123967_2       tr|E3ZSC8|E3ZSC8_LISSE  57.143  112     48      0       1       112     1       112     2.67e-45        145
-    result={}
+    if result is None:
+        result={}
     with open(blast_table) as f:
         for l in f:
             line=l.strip()
@@ -105,14 +106,17 @@ def save_corr(fixed_corr, out_file):
 @click.command()
 @click.option('--corr_file', default="./", help='Folder with BLAST files.')
 @click.option('--corr_ctrl_file', default="./", help='Folder with BLAST files.')
-@click.option('--blast_table', default="./", help='')
+@click.option('--blast_result', default="./", help='')
 @click.option('--fasta_database', default="./", help='')
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
 def main(corr_file, corr_ctrl_file, blast_table, fasta_database, out_file):
     corr_info = read_corr(corr_file)
     cntrl_corr_info = read_corr(corr_ctrl_file)
     corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
-    blast_result = read_blast_result(blast_table)
+    blast_result={}
+    for blast_table in blast_files.split(","):
+        if blast_table:
+            blast_result = read_blast_result(blast_table, blast_result)
     database_fasta_info = get_database_sequences_info(fasta_database)
     fixed_corr = fix_corr(corr_info, blast_result, database_fasta_info)
     save_corr(fixed_corr, out_file)
