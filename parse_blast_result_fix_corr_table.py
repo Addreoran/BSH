@@ -11,7 +11,7 @@ class CorrInfo:
         self.pval=pval
         self.corr=corr
         self.pair=pair
-        self.ctrl=ctrl
+        self.ctrl=None
 
 
 def read_corr(corr_file):
