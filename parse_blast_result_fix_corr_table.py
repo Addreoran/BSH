@@ -3,6 +3,17 @@ import os
 import click
 import numpy as np
 
+class CorrInfo:
+    def __init__(self, line, metabolite, cluster, pval, corrs, pair):
+        self.metabolite=metabolite
+        self.cluster=cluster
+        self.line=line
+        self.pval=pval
+        self.corr=corr
+        self.pair=pair
+        self.ctrl=ctrl
+
+
 def read_corr(corr_file):
     result={}
     with open(corr_file) as f:
@@ -15,19 +26,18 @@ def read_corr(corr_file):
                 if cluster_no not in result:
                     result[cluster_no]={}
                 if metabolite not in result[cluster_no]:
-                    result[cluster_no][metabolite]={}
-                result[cluster_no][metabolite]["line"]=line.strip()
-                result[cluster_no][metabolite]["pval"]=float(data[4])
-                result[cluster_no][metabolite]["corr"]=float(data[3])
-
+                    result[cluster_no][metabolite]=set()
+                result[cluster_no][metabolite].add(CorrInfo(line=line.strip(), metabolite=data[0], cluster=data[1], pval=float(data[4]), corr=float(data[3]), pair=data[2]))
     return result
                 
 
 def compare_cntrl_corr(corr_file, cntrl_corr_info):
     for cluster_no, metabolit_relation in corr_file.items():
         for metabolite, metabolite_cl_data in metabolit_relation.items():
-            metabolite_cl_data["pval_cntrl"]=cntrl_corr_info[cluster_no][metabolite]["pval"]
-            metabolite_cl_data["corr_cntrl"]=cntrl_corr_info[cluster_no][metabolite]["corr"]
+            for cntrl_data in cntrl_corr_info[cluster_no][metabolite]:
+                for searched_data in metabolite_cl_data:
+                    if cntrl_data[pair]==searched_data[pair]:
+                        searched_data.ctrl=cntrl_data
     return corr_file
 
 def get_database_sequences_info(fasta_database):
@@ -64,21 +74,32 @@ def read_blast_result(blast_table):
 def fix_corr(corr_info, blast_result, database_info):
     for cluster_no, metabolit_relation in corr_info.items():
         for metabolite, metabolite_cl_data in metabolit_relation.items():
-            if cluster_no in blast_result:
-                metabolite_cl_data["line"]+=f";{blast_result[cluster_no]['pident']}"
-                metabolite_cl_data["line"]+=f";{blast_result[cluster_no]['protein']}"
-                metabolite_cl_data["line"]+=f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
-                metabolite_cl_data["line"]+=f";{database_info[blast_result[cluster_no]['protein']]['organism_name']}"
-                metabolite_cl_data["line"]+=f";{metabolite_cl_data['pval_cntrl']}"
-                metabolite_cl_data["line"]+=f";{metabolite_cl_data['corr_cntrl']}"
+            for corr_data in metabolite_cl_data:
+                line=f"{corr_data.metabolite};{corr_data.cluster};{corr_data.pair};{corr_data.pval};{corr_data.corr}"
+                corr_data.line=line
+                if cluster_no in blast_result:
+                    corr_data.line+=f";{blast_result[cluster_no]['pident']}"
+                    corr_data.line+=f";{blast_result[cluster_no]['protein']}"
+                    corr_data.line+=f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
+                    corr_data.line+=f";{database_info[blast_result[cluster_no]['protein']]['organism_name']}"
+                    corr_data.line+=f";{corr_data.ctrl.pval}"
+                    corr_data.line+=f";{corr_data.ctrl.corr}"
+                else:
+                    corr_data.line+=f";"
+                    corr_data.line+=f";"
+                    corr_data.line+=f";"
+                    corr_data.line+=f";"
+                    corr_data.line+=f";{corr_data.ctrl.pval}"
+                    corr_data.line+=f";{corr_data.ctrl.corr}"
     return corr_info
     
 def save_corr(fixed_corr, out_file):
     with open(out_file, "w") as f:
         for cluset_no, metabolit_relation in fixed_corr.items():
             for metabolite, metabolite_cl_data in metabolit_relation.items():
-                f.write(metabolite_cl_data["line"])
-                f.write("\n")
+                for corr_data in metabolite_cl_data:
+                    f.write(corr_data.line)
+                    f.write("\n")
 
 
 @click.command()
