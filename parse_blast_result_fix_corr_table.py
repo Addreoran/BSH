@@ -4,7 +4,7 @@ import click
 import numpy as np
 
 class CorrInfo:
-    def __init__(self, line, metabolite, cluster, pval, corrs, pair):
+    def __init__(self, line, metabolite, cluster, pval, corr, pair):
         self.metabolite=metabolite
         self.cluster=cluster
         self.line=line
