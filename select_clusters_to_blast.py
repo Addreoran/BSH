@@ -153,7 +153,8 @@ def run_blast(clusters_file, representatives_of_clusters, cluster_representative
     save_clusters_representatives(cluster_representatives_with_corr_file, representative_significant_sequences)
     #blast(representative_significant_sequences, out_folder)
     # makeblastdb -in ./uniprotkb_ec_3_5_1_24_2025_10_22.fasta -dbtype prot
-    #  blastp -db ./uniprotkb_ec_3_5_1_24_2025_10_22.fasta -out ./3_5_1_24_proteins -query ./clusters_representatives_for_corr.fasta -num_threads 10 -outfmt 6 -evalue 0.01
+    # makeblastdb -in ./uniprot_trembl.fasta -dbtype prot
+    #  blastp -db ./uniprotkb_ec_3_5_1_24_2025_10_22.fasta -out ./3_5_1_24_proteins -query ./clusters_representatives_for_corr.fasta -num_threads 10 -outfmt 6 -evalue 0.01 -qcov_hsp_perc 90
 
 
 
