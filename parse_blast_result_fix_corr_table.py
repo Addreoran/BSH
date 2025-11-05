@@ -91,15 +91,17 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     corr_data.line += f";{blast_result[cluster_no]['protein']}"
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['organism_name']}"
-                    corr_data.line += f";{corr_data.ctrl.pval}"
-                    corr_data.line += f";{corr_data.ctrl.corr}"
+                    if corr_data.ctrl is not None:
+                        corr_data.line += f";{corr_data.ctrl.pval}"
+                        corr_data.line += f";{corr_data.ctrl.corr}"
                 else:
                     corr_data.line += f";"
                     corr_data.line += f";"
                     corr_data.line += f";"
                     corr_data.line += f";"
-                    corr_data.line += f";{corr_data.ctrl.pval}"
-                    corr_data.line += f";{corr_data.ctrl.corr}"
+                    if corr_data.ctrl is not None:
+                        corr_data.line += f";{corr_data.ctrl.pval}"
+                        corr_data.line += f";{corr_data.ctrl.corr}"
     return corr_info
 
 
@@ -113,15 +115,16 @@ def save_corr(fixed_corr, out_file):
 
 
 @click.command()
-@click.option('--corr_file', default="./", help='Folder with BLAST files.')
-@click.option('--corr_ctrl_file', default="./", help='Folder with BLAST files.')
+@click.option('--corr_file', default=False, help='Folder with BLAST files.')
+@click.option('--corr_ctrl_file', default=False, help='Folder with BLAST files.')
 @click.option('--blast_files', default={}, help='')
 @click.option('--fasta_database', default="./", help='')
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
 def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
     corr_info = read_corr(corr_file)
-    cntrl_corr_info = read_corr(corr_ctrl_file)
-    corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
+    if corr_file:
+        cntrl_corr_info = read_corr(corr_ctrl_file)
+        corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
     blast_result = {}
     for blast_table, description in blast_files.items():
         if blast_table:
