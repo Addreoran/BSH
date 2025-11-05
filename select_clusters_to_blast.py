@@ -120,7 +120,7 @@ def read_corr_file(result, file):
                 for e, i in enumerate(line):
                     if i=="pval":
                         pval_no=e
-            if l.strip():
+            elif l.strip():
                 line=l.strip().split(";")
                 metabolite=line[0].strip()
                 pval=float(line[pval_no])
