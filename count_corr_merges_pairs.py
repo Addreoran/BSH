@@ -66,12 +66,8 @@ def select_files_of_metabolites(genes_counts, metabolites):
         file_name = file.split("_", 1)[1].split(".")[0].strip()
         #file_id = file.split("_", 1)[1].split(".")[1].strip()
         #print(file_name, file_id, file_name in metabolites)
-        print(file_name, file_name in metabolites)
-
         if file_name in metabolites:
-           #metabolites[file_name][file_id] = gene_data
             metabolites[file_name] = gene_data
-
     return metabolites
 
 
@@ -83,19 +79,19 @@ def count_pearson_corr(metabolites):
     for files, metabolites_data in metabolites.items():
         all_metabolites = all_metabolites.union(set(metabolites_data["metabolites"].keys()))
         #print(files, metabolites_data)
-        all_genes = all_genes.union(set(metabolites_data.keys()))
-        #all_genes = all_genes.union(set(metabolites_data["2"].keys()))
+        all_genes = all_genes.union(set(metabolites_data["1"].keys()))
         all_files.add(files)
     all_files = list(all_files)
     tests = {}  # (metabo, gene, no):{metabo_values:[], gene_values:[], pval:[], corr_value:[]}
     metabolites_sets = {m: [] for m in list(all_metabolites)}
     genes_1 = {m: [] for m in list(all_genes)}
-    #genes_2 = {m: [] for m in list(all_genes)}
+    genes_2 = {m: [] for m in list(all_genes)}
     for file in all_files:
         for metabolite, metabolites_data in metabolites[file]["metabolites"].items():
             metabolites_sets[metabolite].append(metabolites_data)
         for gene_name, gene_no in metabolites[file].items():
             genes_1[gene_name].append(gene_no)
+
     for metabolite, metabolites_sets in metabolites_sets.items():
         for gene_name, gene_sets in genes_1.items():
             metabolites_list=[]
@@ -108,6 +104,7 @@ def count_pearson_corr(metabolites):
             correlation = pearsonr(metabolites_list, genes_no_list)
             tests[(metabolite, gene_name)] = {"metabo_values": metabolites_list, "gene_values": genes_no_list,
                                                  "pval": correlation.pvalue, "corr_value": correlation.statistic}
+
     return tests
 
 
