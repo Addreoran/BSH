@@ -21,16 +21,17 @@ def read_corr(corr_file):
         for l in f:
             line = l.strip()
             if line:
-                data = line.split(";")
-                metabolite = data[0]
-                cluster_no = data[1].split("_")[-1]
-                if cluster_no not in result:
-                    result[cluster_no] = {}
-                if metabolite not in result[cluster_no]:
-                    result[cluster_no][metabolite] = set()
-                result[cluster_no][metabolite].add(
-                    CorrInfo(line=line.strip(), metabolite=data[0], cluster=data[1], pval=float(data[4]),
-                             corr=float(data[3]), pair=data[2]))
+                if "pval" not in line:
+                    data = line.split(";")
+                    metabolite = data[0]
+                    cluster_no = data[1].split("_")[-1]
+                    if cluster_no not in result:
+                        result[cluster_no] = {}
+                    if metabolite not in result[cluster_no]:
+                        result[cluster_no][metabolite] = set()
+                    result[cluster_no][metabolite].add(
+                        CorrInfo(line=line.strip(), metabolite=data[0], cluster=data[1], pval=float(data[4]),
+                                 corr=float(data[3]), pair=data[2]))
     return result
 
 
