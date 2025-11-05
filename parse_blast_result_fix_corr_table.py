@@ -121,6 +121,7 @@ def save_corr(fixed_corr, out_file):
 @click.option('--fasta_database', default="./", help='')
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
 def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
+    blast_files=eval(blast_files)
     corr_info = read_corr(corr_file)
     import os
     if os.path.exist(corr_file):
