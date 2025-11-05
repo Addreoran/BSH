@@ -30,7 +30,7 @@ def read_corr(corr_file):
                     if metabolite not in result[cluster_no]:
                         result[cluster_no][metabolite] = set()
                     result[cluster_no][metabolite].add(
-                        CorrInfo(line=line.strip(), metabolite=data[0], cluster=data[1], pval=float(data[4]),
+                        CorrInfo(line=line.strip(), metabolite=data[0], cluster=data[1], pval=float(data[3]),
                                  corr=float(data[3]), pair=data[2]))
     return result
 
