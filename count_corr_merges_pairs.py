@@ -62,7 +62,7 @@ def read_metabolites(count_metabolites_files):
 def select_files_of_metabolites(genes_counts, metabolites):
     for file, gene_data in genes_counts.items():
         # mgshot_S4358Nr27.1.fastq.gz.shotgun.tsv
-        print(file)
+        #print(file)
         file_name = file.split("_", 1)[1].split(".")[0].strip()
         #file_id = file.split("_", 1)[1].split(".")[1].strip()
         #print(file_name, file_id, file_name in metabolites)
