@@ -112,12 +112,18 @@ def blast_req(protein):
     return RID
 
 def read_corr_file(result, file):
+    pval_no=None
     with open(file) as f:
         for l in f:
+            if "pval" in l:
+                line=l.split(";")
+                for e, i in enumerate(line):
+                    if i=="pval":
+                        pval_no=e
             if l.strip():
                 line=l.strip().split(";")
                 metabolite=line[0].strip()
-                pval=float(line[4])
+                pval=float(line[pval_no])
                 cluster=line[1].split("_")[1]
                 if pval<0.05 and metabolite in {"Conc Cholic acid", "Conc Litocholic acid"}:
                     result.add(cluster)
