@@ -32,11 +32,12 @@ def main(out_file, in_folder, preffix_files):
                     else:
                         res[probe_id][line[1]].add(line[0])
                     genes.add(line[1])
-            res[probe_id]={i:len(j) for i,j in res[file_name].items()}
+            res[probe_id]={i:len(j) for i,j in res[probe_id].items()}
+        file_list=[file_name.split(".")[0] for file_name in file_list]
         for gene in list(genes):
             f.write(f"{str(gene)};")
             for file_name in file_list:
-                f.write(f"{str(res[probe_id].get(gene, 0))};")
+                f.write(f"{str(res[file_name].get(gene, 0))};")
             f.write("\n")
 
 if __name__=='__main__':
