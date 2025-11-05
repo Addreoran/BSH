@@ -16,8 +16,7 @@ def main(out_file, in_folder, preffix_files):
     #print(file_list)
     with open(out_file, "w") as f: 
         f.write("genes;")
-        f.write(";".join(file_list))
-        f.write("\n")
+
         for e,file_name in enumerate(file_list):
             print(e, file_name)
             probe_id=file_name.split(".")[0]
@@ -34,7 +33,8 @@ def main(out_file, in_folder, preffix_files):
                     genes.add(line[1])
         file_list=list(set([file_name.split(".")[0] for file_name in file_list]))
         
-        
+        f.write(";".join(file_list))
+        f.write("\n")
         for gene in list(genes):
             f.write(f"{str(gene)};")
             for file_name in file_list:
