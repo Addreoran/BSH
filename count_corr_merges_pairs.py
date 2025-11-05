@@ -64,8 +64,10 @@ def select_files_of_metabolites(genes_counts, metabolites):
         # mgshot_S4358Nr27.1.fastq.gz.shotgun.tsv
         print(file)
         file_name = file.split("_", 1)[1].split(".")[0].strip()
-        file_id = file.split("_", 1)[1].split(".")[1].strip()
-        print(file_name, file_id, file_name in metabolites)
+        #file_id = file.split("_", 1)[1].split(".")[1].strip()
+        #print(file_name, file_id, file_name in metabolites)
+        print(file_name, file_name in metabolites)
+
         if file_name in metabolites:
            #metabolites[file_name][file_id] = gene_data
             metabolites[file_name] = gene_data
