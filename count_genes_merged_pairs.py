@@ -21,7 +21,7 @@ def main(out_file, in_folder, preffix_files):
         for e,file_name in enumerate(file_list):
             print(e, file_name)
             probe_id=file_name.split(".")[0]
-            if proble_id not in res:
+            if probe_id not in res:
                 res[probe_id] = {}
             path_to_csv = os.path.join(in_folder, file_name)
             data = np.loadtxt(path_to_csv, dtype=str)
