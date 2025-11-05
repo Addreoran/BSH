@@ -115,14 +115,15 @@ def save_corr(fixed_corr, out_file):
 
 
 @click.command()
-@click.option('--corr_file', default=False, help='Folder with BLAST files.')
-@click.option('--corr_ctrl_file', default=False, help='Folder with BLAST files.')
+@click.option('--corr_file', default="./", help='Folder with BLAST files.')
+@click.option('--corr_ctrl_file', default="./", help='Folder with BLAST files.')
 @click.option('--blast_files', default={}, help='')
 @click.option('--fasta_database', default="./", help='')
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
 def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
     corr_info = read_corr(corr_file)
-    if corr_file:
+    import os
+    if os.path.exist(corr_file):
         cntrl_corr_info = read_corr(corr_ctrl_file)
         corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
     blast_result = {}
