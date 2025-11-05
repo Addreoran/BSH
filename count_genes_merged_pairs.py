@@ -38,8 +38,8 @@ def main(out_file, in_folder, preffix_files):
         for gene in list(genes):
             f.write(f"{str(gene)};")
             for file_name in file_list:
-                res[file_name]={i:len(j) for i,j in res[file_name].items()}
-                f.write(f"{str(res[file_name].get(gene, 0))};")
+                #res[file_name]={i:len(j) for i,j in res[file_name].items()}
+                f.write(f"{str(len(res[file_name].get(gene, [])))};")
             f.write("\n")
 
 if __name__=='__main__':
