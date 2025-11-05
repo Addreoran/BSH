@@ -20,7 +20,7 @@ def main(out_file, in_folder, preffix_files):
         f.write("\n")
         for e,file_name in enumerate(file_list):
             print(e, file_name)
-            probe_id=file_name.split(".")
+            probe_id=file_name.split(".")[0]
             res[probe_id] = {}
             path_to_csv = os.path.join(in_folder, file_name)
             data = np.loadtxt(path_to_csv, dtype=str)
