@@ -62,6 +62,9 @@ def read_blast_result(blast_table, description, database_fasta_info, result=None
     # 5857992;4123967_2       tr|E3ZSC8|E3ZSC8_LISSE  57.143  112     48      0       1       112     1       112     2.67e-45        145
     if result is None:
         result = {}
+    from ete3 import NCBITaxa
+    ncbi = NCBITaxa()
+    ncbi.update_taxonomy_database()
     with open(blast_table) as f:
         for l in f:
             line = l.strip()
@@ -70,14 +73,17 @@ def read_blast_result(blast_table, description, database_fasta_info, result=None
                 cl_no = line[0].split(";")[0]
                 protein = line[1].split("|")[1]
                 pident = float(line[2])
-                mammals={"Mus musculus", "human gut metagenome"}
-                if cl_no in result and database_fasta_info[protein]['organism_name'] not in mammals:
-                    if result[cl_no]["pident"] < pident:
-                        result[cl_no]["pident"] = pident
-                        result[cl_no]["protein"] = protein
-                        result[cl_no]["description"] = description
-                else:
-                    result[cl_no] = {"pident": pident, "protein": protein}
+                2759
+                name2taxid = ncbi.get_name_translator([database_fasta_info[protein]['organism_name']])[database_fasta_info[protein]['organism_name']]
+                lineage=ncbi.get_lineage(name2taxid)
+                if 2759 not in lineage:
+                    if cl_no in result:
+                        if result[cl_no]["pident"] < pident:
+                            result[cl_no]["pident"] = pident
+                            result[cl_no]["protein"] = protein
+                            result[cl_no]["description"] = description
+                    else:
+                        result[cl_no] = {"pident": pident, "protein": protein}
     return result
 
 
