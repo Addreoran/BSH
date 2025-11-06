@@ -70,7 +70,7 @@ def read_blast_result(blast_table, description, database_fasta_info, result=None
                 cl_no = line[0].split(";")[0]
                 protein = line[1].split("|")[1]
                 pident = float(line[2])
-                mammals={"Mus musculus"}
+                mammals={"Mus musculus", "human gut metagenome "}
                 if cl_no in result and database_fasta_info[protein]['organism_name'] not in mammals:
                     if result[cl_no]["pident"] < pident:
                         result[cl_no]["pident"] = pident
