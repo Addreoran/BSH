@@ -148,7 +148,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file):
     blast_files = eval(blast_files)
     corr_info = read_corr(corr_file)
     import os
-    if os.path.exists(corr_file):
+    if os.path.exists(corr_ctrl_file):
         cntrl_corr_info = read_corr(corr_ctrl_file)
         corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
     blast_result = {}
