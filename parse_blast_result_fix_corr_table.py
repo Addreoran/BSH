@@ -72,6 +72,7 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi,result
                 cl_no = line[0].split(";")[0]
                 protein = line[1].split("|")[1]
                 pident = float(line[2])
+                print(database_fasta_info[protein]['organism_name'])
                 name2taxid = ncbi.get_name_translator([database_fasta_info[protein]['organism_name']])
                 name2taxid=name2taxid[list(name2taxid.keys())[0]]
                 lineage=ncbi.get_lineage(name2taxid)
