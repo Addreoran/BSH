@@ -73,7 +73,7 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi,result
                 protein = line[1].split("|")[1]
                 pident = float(line[2])
                 name2taxid = ncbi.get_name_translator([database_fasta_info[protein]['organism_name']])
-                name2taxid=name2taxid[name2taxid.keys()[0]]
+                name2taxid=name2taxid[list(name2taxid.keys())[0]]
                 lineage=ncbi.get_lineage(name2taxid)
                 if 2759 not in lineage:
                     if cl_no in result:
