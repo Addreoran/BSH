@@ -115,10 +115,8 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     corr_data.line += f";{blast_result[cluster_no]['blast_table']}"
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['organism_name']}"
-
-                    if corr_data.ctrl is not None:
-                        corr_data.line += f";{corr_data.ctrl.pval}"
-                        corr_data.line += f";{corr_data.ctrl.corr}"
+                    corr_data.line += f";{corr_data.ctrl.pval}"
+                    corr_data.line += f";{corr_data.ctrl.corr}"
                 else:
                     corr_data.line += f";"
                     corr_data.line += f";"
@@ -126,9 +124,8 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     corr_data.line += f";"
                     corr_data.line += f";"
                     corr_data.line += f";"
-                    if corr_data.ctrl is not None:
-                        corr_data.line += f";{corr_data.ctrl.pval}"
-                        corr_data.line += f";{corr_data.ctrl.corr}"
+                    corr_data.line += f";{corr_data.ctrl.pval}"
+                    corr_data.line += f";{corr_data.ctrl.corr}"
     return corr_info
 
 
