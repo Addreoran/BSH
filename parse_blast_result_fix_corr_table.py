@@ -2,6 +2,7 @@ import os
 
 import click
 import numpy as np
+from ete3 import NCBITaxa
 
 
 class CorrInfo:
@@ -58,13 +59,11 @@ def get_database_sequences_info(fasta_database):
     return result
 
 
-def read_blast_result(blast_table, description, database_fasta_info, result=None):
+def read_blast_result(blast_table, description, database_fasta_info, ncbi,result=None):
     # 5857992;4123967_2       tr|E3ZSC8|E3ZSC8_LISSE  57.143  112     48      0       1       112     1       112     2.67e-45        145
     if result is None:
         result = {}
-    from ete3 import NCBITaxa
-    ncbi = NCBITaxa()
-    ncbi.update_taxonomy_database()
+
     with open(blast_table) as f:
         for l in f:
             line = l.strip()
@@ -73,7 +72,6 @@ def read_blast_result(blast_table, description, database_fasta_info, result=None
                 cl_no = line[0].split(";")[0]
                 protein = line[1].split("|")[1]
                 pident = float(line[2])
-                2759
                 name2taxid = ncbi.get_name_translator([database_fasta_info[protein]['organism_name']])[database_fasta_info[protein]['organism_name']]
                 lineage=ncbi.get_lineage(name2taxid)
                 if 2759 not in lineage:
@@ -137,9 +135,11 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
         corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
     blast_result = {}
     database_fasta_info = get_database_sequences_info(fasta_database)
+    ncbi = NCBITaxa()
+    ncbi.update_taxonomy_database()
     for blast_table, description in blast_files.items():
         if blast_table:
-            blast_result = read_blast_result(blast_table, description, database_fasta_info, blast_result)
+            blast_result = read_blast_result(blast_table, description, database_fasta_info, ncbi,blast_result)
     fixed_corr = fix_corr(corr_info, blast_result, database_fasta_info)
     save_corr(fixed_corr, out_file)
 
