@@ -3,6 +3,7 @@ import os
 import click
 import numpy as np
 from ete3 import NCBITaxa
+import six
 
 
 class CorrInfo:
@@ -55,11 +56,13 @@ def get_database_sequences_info(fasta_database):
                 uniprot_id = line.split("|")[1]
                 protein_name = line.split("OS=")[0].split(" ", 1)[-1]
                 organism_name = line.split("OS=", 1)[1].split("OX=")[0]
-                result[uniprot_id] = {"protein_name": protein_name, "organism_name": organism_name}
+                organism_taxid = line.split("OX=")[-1].split(" GN=")[0]
+                result[uniprot_id] = {"protein_name": protein_name, "organism_name": organism_name,
+                                      "organism_taxid": organism_taxid}
     return result
 
 
-def read_blast_result(blast_table, description, database_fasta_info, ncbi,result=None):
+def read_blast_result(blast_table, description, database_fasta_info, ncbi, result=None):
     # 5857992;4123967_2       tr|E3ZSC8|E3ZSC8_LISSE  57.143  112     48      0       1       112     1       112     2.67e-45        145
     if result is None:
         result = {}
@@ -72,10 +75,8 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi,result
                 cl_no = line[0].split(";")[0]
                 protein = line[1].split("|")[1]
                 pident = float(line[2])
-                print(database_fasta_info[protein]['organism_name'])
-                name2taxid = ncbi.get_name_translator([database_fasta_info[protein]['organism_name']])
-                name2taxid=name2taxid[list(name2taxid.keys())[0]]
-                lineage=ncbi.get_lineage(name2taxid)
+                print(database_fasta_info[protein]['organism_taxid'])
+                lineage = ncbi.get_lineage(database_fasta_info[protein]['organism_taxid'])
                 if 2759 not in lineage:
                     if cl_no in result:
                         if result[cl_no]["pident"] < pident:
@@ -129,7 +130,7 @@ def save_corr(fixed_corr, out_file):
 @click.option('--fasta_database', default="./", help='')
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
 def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
-    blast_files=eval(blast_files)
+    blast_files = eval(blast_files)
     corr_info = read_corr(corr_file)
     import os
     if os.path.exists(corr_file):
@@ -141,7 +142,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
     ncbi.update_taxonomy_database()
     for blast_table, description in blast_files.items():
         if blast_table:
-            blast_result = read_blast_result(blast_table, description, database_fasta_info, ncbi,blast_result)
+            blast_result = read_blast_result(blast_table, description, database_fasta_info, ncbi, blast_result)
     fixed_corr = fix_corr(corr_info, blast_result, database_fasta_info)
     save_corr(fixed_corr, out_file)
 
