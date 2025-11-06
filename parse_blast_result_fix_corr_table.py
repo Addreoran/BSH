@@ -70,7 +70,8 @@ def read_blast_result(blast_table, description, result=None):
                 cl_no = line[0].split(";")[0]
                 protein = line[1].split("|")[1]
                 pident = float(line[2])
-                if cl_no in result:
+                mammals={"Mus musculus"}
+                if cl_no in result and protein['organism_name'] not in mammals:
                     if result[cl_no]["pident"] < pident:
                         result[cl_no]["pident"] = pident
                         result[cl_no]["protein"] = protein
