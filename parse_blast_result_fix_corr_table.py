@@ -42,8 +42,7 @@ def compare_cntrl_corr(corr_file, cntrl_corr_info):
         for metabolite, metabolite_cl_data in metabolit_relation.items():
             for cntrl_data in cntrl_corr_info[cluster_no][metabolite]:
                 for searched_data in metabolite_cl_data:
-                    if cntrl_data.pair == searched_data.pair:
-                        searched_data.ctrl = cntrl_data
+                    searched_data.ctrl = cntrl_data
     return corr_file
 
 
