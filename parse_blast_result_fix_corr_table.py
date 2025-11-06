@@ -113,6 +113,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     print(corr_data.line)
                     print(cluster_no)
                     print(blast_result[cluster_no])
+                    print(database_info.keys())
                     corr_data.line += f";{blast_result[cluster_no]['pident']}"
                     corr_data.line += f";{blast_result[cluster_no]['protein']}"
                     corr_data.line += f";{blast_result[cluster_no]['description']}"
