@@ -58,7 +58,7 @@ def get_database_sequences_info(fasta_database):
     return result
 
 
-def read_blast_result(blast_table, description, result=None):
+def read_blast_result(blast_table, description, database_fasta_info, result=None):
     # 5857992;4123967_2       tr|E3ZSC8|E3ZSC8_LISSE  57.143  112     48      0       1       112     1       112     2.67e-45        145
     if result is None:
         result = {}
@@ -71,7 +71,7 @@ def read_blast_result(blast_table, description, result=None):
                 protein = line[1].split("|")[1]
                 pident = float(line[2])
                 mammals={"Mus musculus"}
-                if cl_no in result and protein['organism_name'] not in mammals:
+                if cl_no in result and database_fasta_info[protein]['organism_name'] not in mammals:
                     if result[cl_no]["pident"] < pident:
                         result[cl_no]["pident"] = pident
                         result[cl_no]["protein"] = protein
@@ -130,10 +130,10 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
         cntrl_corr_info = read_corr(corr_ctrl_file)
         corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
     blast_result = {}
+    database_fasta_info = get_database_sequences_info(fasta_database)
     for blast_table, description in blast_files.items():
         if blast_table:
-            blast_result = read_blast_result(blast_table, description, blast_result)
-    database_fasta_info = get_database_sequences_info(fasta_database)
+            blast_result = read_blast_result(blast_table, description, database_fasta_info, blast_result)
     fixed_corr = fix_corr(corr_info, blast_result, database_fasta_info)
     save_corr(fixed_corr, out_file)
 
