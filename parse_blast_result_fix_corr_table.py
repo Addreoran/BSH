@@ -47,8 +47,7 @@ def compare_cntrl_corr(corr_file, cntrl_corr_info):
     return corr_file
 
 
-def get_database_sequences_info(fasta_database):
-    result = {}
+def get_database_sequences_info(fasta_database, result={}):
     with open(fasta_database) as f:
         for l in f:
             line = l.strip()
@@ -146,7 +145,7 @@ def save_corr(fixed_corr, out_file):
 @click.option('--corr_file', default="./", help='Folder with BLAST files.')
 @click.option('--corr_ctrl_file', default="./", help='Folder with BLAST files.')
 @click.option('--blast_files', default={}, help='')
-@click.option('--fasta_database', default="./", help='')
+@click.option('--fasta_databases', default="./", help='')
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
 def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
     blast_files = eval(blast_files)
@@ -156,7 +155,9 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
         cntrl_corr_info = read_corr(corr_ctrl_file)
         corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
     blast_result = {}
-    database_fasta_info = get_database_sequences_info(fasta_database)
+    database_fasta_info = {}
+    for fasta_db in fasta_databases.split(","):
+        database_fasta_info= get_database_sequences_info(fasta_database, database_fasta_info)
     ncbi = NCBITaxa()
     # ncbi.update_taxonomy_database()
     for blast_table, description in blast_files.items():
