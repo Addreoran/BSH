@@ -110,6 +110,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                 if cluster_no in blast_result:
                     corr_data.line += f";{blast_result[cluster_no]['pident']}"
                     corr_data.line += f";{blast_result[cluster_no]['protein']}"
+                    corr_data.line += f";https://www.uniprot.org/uniprotkb/{blast_result[cluster_no]['protein']}/entry"
                     corr_data.line += f";{blast_result[cluster_no]['description']}"
                     corr_data.line += f";{blast_result[cluster_no]['blast_table']}"
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
@@ -117,6 +118,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     corr_data.line += f";{corr_data.ctrl.pval}"
                     corr_data.line += f";{corr_data.ctrl.corr}"
                 else:
+                    corr_data.line += f";"
                     corr_data.line += f";"
                     corr_data.line += f";"
                     corr_data.line += f";"
