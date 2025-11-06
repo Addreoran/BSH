@@ -85,7 +85,8 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                             result[cl_no]["description"] = description
                             result[cl_no]["blast_table"] = blast_table
                     else:
-                        result[cl_no] = {"pident": pident, "protein": protein}
+                        result[cl_no] = {"pident": pident, "protein": protein, "description": description,
+                                         "blast_table": blast_table}
     return result
 
 
