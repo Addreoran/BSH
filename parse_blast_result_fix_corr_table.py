@@ -59,7 +59,6 @@ def get_database_sequences_info(fasta_database):
                 organism_taxid = line.split("OX=")[-1].split(" ")[0]
                 result[uniprot_id] = {"protein_name": protein_name, "organism_name": organism_name,
                                       "organism_taxid": organism_taxid}
-    print(len(result.keys()))
     return result
 
 
@@ -111,10 +110,6 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     line = f"{corr_data.metabolite};{corr_data.cluster};{corr_data.pair};{corr_data.pval};{corr_data.corr}"
                     corr_data.line = line
                 if cluster_no in blast_result:
-                    print(corr_data.line)
-                    print(cluster_no)
-                    print(blast_result[cluster_no])
-                    print(database_info.keys())
                     corr_data.line += f";{blast_result[cluster_no]['pident']}"
                     corr_data.line += f";{blast_result[cluster_no]['protein']}"
                     corr_data.line += f";{blast_result[cluster_no]['description']}"
