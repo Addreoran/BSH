@@ -105,14 +105,14 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
     for cluster_no, metabolit_relation in corr_info.items():
         for metabolite, metabolite_cl_data in metabolit_relation.items():
             for corr_data in metabolite_cl_data:
-                print(corr_data.line )
-                print(cluster_no)
-                print(blast_result[cluster_no])
 
                 if not save_old_line:
                     line = f"{corr_data.metabolite};{corr_data.cluster};{corr_data.pair};{corr_data.pval};{corr_data.corr}"
                     corr_data.line = line
                 if cluster_no in blast_result:
+                    print(corr_data.line)
+                    print(cluster_no)
+                    print(blast_result[cluster_no])
                     corr_data.line += f";{blast_result[cluster_no]['pident']}"
                     corr_data.line += f";{blast_result[cluster_no]['protein']}"
                     corr_data.line += f";{blast_result[cluster_no]['description']}"
