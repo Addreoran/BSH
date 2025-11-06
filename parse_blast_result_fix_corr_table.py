@@ -89,15 +89,16 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                             result[cl_no] = {"pident": pident, "protein": protein, "description": description,
                                              "blast_table": blast_table}
                 except:
-                    if cl_no in result:
-                        if result[cl_no]["pident"] < pident:
-                            result[cl_no]["pident"] = pident
-                            result[cl_no]["protein"] = protein
-                            result[cl_no]["description"] = description
-                            result[cl_no]["blast_table"] = blast_table
-                    else:
-                        result[cl_no] = {"pident": pident, "protein": protein, "description": description,
-                                         "blast_table": blast_table}
+                    if 2759 not in lineage:
+                        if cl_no in result:
+                            if result[cl_no]["pident"] < pident:
+                                result[cl_no]["pident"] = pident
+                                result[cl_no]["protein"] = protein
+                                result[cl_no]["description"] = description
+                                result[cl_no]["blast_table"] = blast_table
+                        else:
+                            result[cl_no] = {"pident": pident, "protein": protein, "description": description,
+                                             "blast_table": blast_table}
     return result
 
 
@@ -105,6 +106,10 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
     for cluster_no, metabolit_relation in corr_info.items():
         for metabolite, metabolite_cl_data in metabolit_relation.items():
             for corr_data in metabolite_cl_data:
+                print(corr_data.line )
+                print(cluster_no)
+                print(blast_result[cluster_no])
+
                 if not save_old_line:
                     line = f"{corr_data.metabolite};{corr_data.cluster};{corr_data.pair};{corr_data.pval};{corr_data.corr}"
                     corr_data.line = line
