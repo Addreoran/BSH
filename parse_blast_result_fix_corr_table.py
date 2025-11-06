@@ -157,7 +157,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
     blast_result = {}
     database_fasta_info = {}
     for fasta_db in fasta_databases.split(","):
-        database_fasta_info= get_database_sequences_info(fasta_database, database_fasta_info)
+        database_fasta_info= get_database_sequences_info(fasta_db, database_fasta_info)
     ncbi = NCBITaxa()
     # ncbi.update_taxonomy_database()
     for blast_table, description in blast_files.items():
