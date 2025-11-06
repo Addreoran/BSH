@@ -75,7 +75,7 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                 cl_no = line[0].split(";")[0]
                 protein = line[1].split("|")[1]
                 pident = float(line[2])
-                print(database_fasta_info[protein]['organism_taxid'])
+                #print(database_fasta_info[protein]['organism_taxid'])
                 lineage = ncbi.get_lineage(database_fasta_info[protein]['organism_taxid'])
                 if 2759 not in lineage:
                     if cl_no in result:
@@ -83,6 +83,7 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                             result[cl_no]["pident"] = pident
                             result[cl_no]["protein"] = protein
                             result[cl_no]["description"] = description
+                            result[cl_no]["blast_table"] = blast_table
                     else:
                         result[cl_no] = {"pident": pident, "protein": protein}
     return result
@@ -98,12 +99,18 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                 if cluster_no in blast_result:
                     corr_data.line += f";{blast_result[cluster_no]['pident']}"
                     corr_data.line += f";{blast_result[cluster_no]['protein']}"
+                    corr_data.line += f";{blast_result[cluster_no]['description']}"
+                    corr_data.line += f";{blast_result[cluster_no]['blast_table']}"
+
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['organism_name']}"
+
                     if corr_data.ctrl is not None:
                         corr_data.line += f";{corr_data.ctrl.pval}"
                         corr_data.line += f";{corr_data.ctrl.corr}"
                 else:
+                    corr_data.line += f";"
+                    corr_data.line += f";"
                     corr_data.line += f";"
                     corr_data.line += f";"
                     corr_data.line += f";"
@@ -139,7 +146,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
     blast_result = {}
     database_fasta_info = get_database_sequences_info(fasta_database)
     ncbi = NCBITaxa()
-    ncbi.update_taxonomy_database()
+    #ncbi.update_taxonomy_database()
     for blast_table, description in blast_files.items():
         if blast_table:
             blast_result = read_blast_result(blast_table, description, database_fasta_info, ncbi, blast_result)
