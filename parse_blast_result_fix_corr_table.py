@@ -56,7 +56,7 @@ def get_database_sequences_info(fasta_database):
                 uniprot_id = line.split("|")[1]
                 protein_name = line.split("OS=")[0].split(" ", 1)[-1]
                 organism_name = line.split("OS=", 1)[1].split("OX=")[0]
-                organism_taxid = line.split("OX=")[-1].split(" GN=")[0]
+                organism_taxid = line.split("OX=")[-1].split(" ")[0]
                 result[uniprot_id] = {"protein_name": protein_name, "organism_name": organism_name,
                                       "organism_taxid": organism_taxid}
     return result
