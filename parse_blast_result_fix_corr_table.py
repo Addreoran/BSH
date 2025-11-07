@@ -7,14 +7,29 @@ import six
 
 
 class CorrInfo:
-    def __init__(self, line, metabolite, cluster, pval, corr, pair):
+    def __init__(self, line, metabolite, cluster, pval, corr, pair, metabo_values_list, gene_values_list):
+        #             f.write(','.join([str(i) for i in datasets_data['metabo_values']]))
+        #             f.write(";")
+        #             f.write(','.join([str(i) for i in datasets_data['gene_values']]))
         self.metabolite = metabolite
         self.cluster = cluster
         self.line = line
         self.pval = pval
         self.corr = corr
         self.pair = pair
+        self.metabo_values_list = metabo_values_list.split(',')
+        self.gene_values_list = gene_values_list.split(',')
         self.ctrl = None
+        self.fisher = None
+        self.zou = None
+
+    def count(self):
+        fisher = independent_corr(self.corr, self.ctrl.corr, len(self.metabo_values_list),
+                                  len(self.ctrl.metabo_values_list), method='fisher')
+        zou = independent_corr(self.corr, self.ctrl.corr, len(self.metabo_values_list),
+                               len(self.ctrl.metabo_values_list), method='zou')
+        self.fisher = f"{fisher[0]};{fisher[1]}"
+        self.zou = f"{zou[0]};{zou[1]}"
 
 
 def read_corr(corr_file):
@@ -33,7 +48,8 @@ def read_corr(corr_file):
                         result[cluster_no][metabolite] = set()
                     result[cluster_no][metabolite].add(
                         CorrInfo(line=line.strip(), metabolite=data[0], cluster=data[1], pval=float(data[3]),
-                                 corr=float(data[3]), pair=data[2]))
+                                 corr=float(data[3]), pair=data[2], metabo_values_list=data[4],
+                                 gene_values_list=data[5]))
     return result
 
 
@@ -43,6 +59,7 @@ def compare_cntrl_corr(corr_file, cntrl_corr_info):
             for cntrl_data in cntrl_corr_info[cluster_no][metabolite]:
                 for searched_data in metabolite_cl_data:
                     searched_data.ctrl = cntrl_data
+                    searched_data.count()
     return corr_file
 
 
@@ -125,6 +142,57 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
     return result
 
 
+import numpy as np
+from scipy.stats import t, norm
+from math import atanh, pow
+from numpy import tanh
+
+
+def rz_ci(r, n, conf_level=0.95):
+    zr_se = pow(1 / (n - 3), .5)
+    moe = norm.ppf(1 - (1 - conf_level) / float(2)) * zr_se
+    zu = atanh(r) + moe
+    zl = atanh(r) - moe
+    return tanh((zl, zu))
+
+
+def independent_corr(xy, ab, n, n2=None, twotailed=True, conf_level=0.95, method='fisher'):
+    """
+    Calculates the statistic significance between two independent correlation coefficients
+    @param xy: correlation coefficient between x and y
+    @param xz: correlation coefficient between a and b
+    @param n: number of elements in xy
+    @param n2: number of elements in ab (if distinct from n)
+    @param twotailed: whether to calculate a one or two tailed test, only works for 'fisher' method
+    @param conf_level: confidence level, only works for 'zou' method
+    @param method: defines the method uses, 'fisher' or 'zou'
+    @return: z and p-val
+    """
+
+    if method == 'fisher':
+        xy_z = 0.5 * np.log((1 + xy) / (1 - xy))
+        ab_z = 0.5 * np.log((1 + ab) / (1 - ab))
+        if n2 is None:
+            n2 = n
+
+        se_diff_r = np.sqrt(1 / (n - 3) + 1 / (n2 - 3))
+        diff = xy_z - ab_z
+        z = abs(diff / se_diff_r)
+        p = (1 - norm.cdf(z))
+        if twotailed:
+            p *= 2
+
+        return z, p
+    elif method == 'zou':
+        L1 = rz_ci(xy, n, conf_level=conf_level)[0]
+        U1 = rz_ci(xy, n, conf_level=conf_level)[1]
+        L2 = rz_ci(ab, n2, conf_level=conf_level)[0]
+        U2 = rz_ci(ab, n2, conf_level=conf_level)[1]
+        lower = xy - ab - pow((pow((xy - L1), 2) + pow((U2 - ab), 2)), 0.5)
+        upper = xy - ab + pow((pow((U1 - xy), 2) + pow((ab - L2), 2)), 0.5)
+        return lower, upper
+
+
 def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
     for cluster_no, metabolit_relation in corr_info.items():
         for metabolite, metabolite_cl_data in metabolit_relation.items():
@@ -146,6 +214,8 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     if corr_data.ctrl is not None:
                         corr_data.line += f";{corr_data.ctrl.pval}"
                         corr_data.line += f";{corr_data.ctrl.corr}"
+                        corr_data.line += f";{corr_data.zou}"
+                        corr_data.line += f";{corr_data.fisher}"
                 else:
                     corr_data.line += f";"
                     corr_data.line += f";"
@@ -157,6 +227,8 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     if corr_data.ctrl is not None:
                         corr_data.line += f";{corr_data.ctrl.pval}"
                         corr_data.line += f";{corr_data.ctrl.corr}"
+                        corr_data.line += f";{corr_data.zou}"
+                        corr_data.line += f";{corr_data.fisher}"
     return corr_info
 
 
@@ -186,7 +258,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
     blast_result = {}
     database_fasta_info = {}
     for fasta_db in fasta_databases.split(","):
-        database_fasta_info= get_database_sequences_info(fasta_db, database_fasta_info)
+        database_fasta_info = get_database_sequences_info(fasta_db, database_fasta_info)
     ncbi = NCBITaxa()
     # ncbi.update_taxonomy_database()
     for blast_table, description in blast_files.items():
