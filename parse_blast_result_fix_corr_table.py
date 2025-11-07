@@ -212,10 +212,13 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['organism_taxid']}"
 
                     if corr_data.ctrl is not None:
-                        corr_data.line += f";{corr_data.ctrl.pval}"
                         corr_data.line += f";{corr_data.ctrl.corr}"
+                        corr_data.line += f";{corr_data.ctrl.pval}"
                         corr_data.line += f";{corr_data.zou}"
                         corr_data.line += f";{corr_data.fisher}"
+                        corr_data.line += f";{corr_data.fisher}"
+                        corr_data.line += f";{str(len(corr_data.metabo_values_list))}"
+                        corr_data.line += f";{str(len(corr_data.gene_values_list))}"
                 else:
                     corr_data.line += f";"
                     corr_data.line += f";"
@@ -226,10 +229,12 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     corr_data.line += f";"
                     corr_data.line += f";"
                     if corr_data.ctrl is not None:
-                        corr_data.line += f";{corr_data.ctrl.pval}"
                         corr_data.line += f";{corr_data.ctrl.corr}"
+                        corr_data.line += f";{corr_data.ctrl.pval}"
                         corr_data.line += f";{corr_data.zou}"
                         corr_data.line += f";{corr_data.fisher}"
+                        corr_data.line += f";{str(len(corr_data.metabo_values_list))}"
+                        corr_data.line += f";{str(len(corr_data.gene_values_list))}"
     return corr_info
 
 
