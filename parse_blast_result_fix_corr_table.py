@@ -42,13 +42,11 @@ def compare_cntrl_corr(corr_file, cntrl_corr_info):
         for metabolite, metabolite_cl_data in metabolit_relation.items():
             for cntrl_data in cntrl_corr_info[cluster_no][metabolite]:
                 for searched_data in metabolite_cl_data:
-                    if cntrl_data.pair == searched_data.pair:
-                        searched_data.ctrl = cntrl_data
+                    searched_data.ctrl = cntrl_data
     return corr_file
 
 
-def get_database_sequences_info(fasta_database):
-    result = {}
+def get_database_sequences_info(fasta_database, result={}):
     with open(fasta_database) as f:
         for l in f:
             line = l.strip()
@@ -138,6 +136,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                 if cluster_no in blast_result:
                     corr_data.line += f";{blast_result[cluster_no]['pident']}"
                     corr_data.line += f";{blast_result[cluster_no]['protein']}"
+                    corr_data.line += f";https://www.uniprot.org/uniprotkb/{blast_result[cluster_no]['protein']}/entry"
                     corr_data.line += f";{blast_result[cluster_no]['description']}"
                     corr_data.line += f";{blast_result[cluster_no]['blast_table']}"
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
@@ -174,18 +173,20 @@ def save_corr(fixed_corr, out_file):
 @click.option('--corr_file', default="./", help='Folder with BLAST files.')
 @click.option('--corr_ctrl_file', default="./", help='Folder with BLAST files.')
 @click.option('--blast_files', default={}, help='')
-@click.option('--fasta_database', default="./", help='')
+@click.option('--fasta_databases', default="./", help='')
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
 @click.option('--main_taxids', default=None, help='Out file with genes statistics.')
-def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file, main_taxids):
+def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main_taxids):
     blast_files = eval(blast_files)
     corr_info = read_corr(corr_file)
     import os
-    if os.path.exists(corr_file):
+    if os.path.exists(corr_ctrl_file):
         cntrl_corr_info = read_corr(corr_ctrl_file)
         corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
     blast_result = {}
-    database_fasta_info = get_database_sequences_info(fasta_database)
+    database_fasta_info = {}
+    for fasta_db in fasta_databases.split(","):
+        database_fasta_info= get_database_sequences_info(fasta_db, database_fasta_info)
     ncbi = NCBITaxa()
     # ncbi.update_taxonomy_database()
     for blast_table, description in blast_files.items():
