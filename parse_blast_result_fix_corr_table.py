@@ -62,7 +62,7 @@ def get_database_sequences_info(fasta_database):
     return result
 
 
-def read_blast_result(blast_table, description, database_fasta_info, ncbi, result=None):
+def read_blast_result(blast_table, description, database_fasta_info, ncbi, result=None, main_taxids=None):
     # 5857992;4123967_2       tr|E3ZSC8|E3ZSC8_LISSE  57.143  112     48      0       1       112     1       112     2.67e-45        145
     if result is None:
         result = {}
@@ -75,10 +75,46 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                 cl_no = line[0].split(";")[0]
                 protein = line[1].split("|")[1]
                 pident = float(line[2])
+                eval = float(line[10])
                 # print(database_fasta_info[protein]['organism_taxid'])
-                try:
-                    lineage = ncbi.get_lineage(database_fasta_info[protein]['organism_taxid'])
-                    if 2759 not in lineage:
+                if main_taxids:
+                    if database_fasta_info[protein]['organism_taxid'] in main_taxids:
+                        if cl_no in result:
+                            if result[cl_no]["pident"] < pident:
+                                result[cl_no]["pident"] = pident
+                                result[cl_no]["protein"] = protein
+                                result[cl_no]["description"] = description
+                                result[cl_no]["blast_table"] = blast_table
+                                result[cl_no]["eval"] = eval
+                            if result[cl_no]["pident"] == pident:
+                                if eval < result[cl_no]["eval"]:
+                                    result[cl_no]["pident"] = pident
+                                    result[cl_no]["protein"] = protein
+                                    result[cl_no]["description"] = description
+                                    result[cl_no]["blast_table"] = blast_table
+                                    result[cl_no]["eval"] = eval
+                else:
+                    try:
+                        lineage = ncbi.get_lineage(database_fasta_info[protein]['organism_taxid'])
+                        if 2759 not in lineage:
+                            if cl_no in result:
+                                if result[cl_no]["pident"] < pident:
+                                    result[cl_no]["pident"] = pident
+                                    result[cl_no]["protein"] = protein
+                                    result[cl_no]["description"] = description
+                                    result[cl_no]["blast_table"] = blast_table
+                                    result[cl_no]["eval"] = eval
+                                if result[cl_no]["pident"] == pident:
+                                    if eval < result[cl_no]["eval"]:
+                                        result[cl_no]["pident"] = pident
+                                        result[cl_no]["protein"] = protein
+                                        result[cl_no]["description"] = description
+                                        result[cl_no]["blast_table"] = blast_table
+                                        result[cl_no]["eval"] = eval
+                            else:
+                                result[cl_no] = {"pident": pident, "protein": protein, "description": description,
+                                                 "blast_table": blast_table, "eval": eval}
+                    except:
                         if cl_no in result:
                             if result[cl_no]["pident"] < pident:
                                 result[cl_no]["pident"] = pident
@@ -88,16 +124,6 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                         else:
                             result[cl_no] = {"pident": pident, "protein": protein, "description": description,
                                              "blast_table": blast_table}
-                except:
-                    if cl_no in result:
-                        if result[cl_no]["pident"] < pident:
-                            result[cl_no]["pident"] = pident
-                            result[cl_no]["protein"] = protein
-                            result[cl_no]["description"] = description
-                            result[cl_no]["blast_table"] = blast_table
-                    else:
-                        result[cl_no] = {"pident": pident, "protein": protein, "description": description,
-                                         "blast_table": blast_table}
     return result
 
 
@@ -116,11 +142,13 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     corr_data.line += f";{blast_result[cluster_no]['blast_table']}"
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
                     corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['organism_name']}"
+                    corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['organism_taxid']}"
 
                     if corr_data.ctrl is not None:
                         corr_data.line += f";{corr_data.ctrl.pval}"
                         corr_data.line += f";{corr_data.ctrl.corr}"
                 else:
+                    corr_data.line += f";"
                     corr_data.line += f";"
                     corr_data.line += f";"
                     corr_data.line += f";"
@@ -148,7 +176,8 @@ def save_corr(fixed_corr, out_file):
 @click.option('--blast_files', default={}, help='')
 @click.option('--fasta_database', default="./", help='')
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
-def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
+@click.option('--main_taxids', default=None, help='Out file with genes statistics.')
+def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file, main_taxids):
     blast_files = eval(blast_files)
     corr_info = read_corr(corr_file)
     import os
@@ -161,7 +190,8 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_database, out_file):
     # ncbi.update_taxonomy_database()
     for blast_table, description in blast_files.items():
         if blast_table:
-            blast_result = read_blast_result(blast_table, description, database_fasta_info, ncbi, blast_result)
+            blast_result = read_blast_result(blast_table, description, database_fasta_info, ncbi, blast_result,
+                                             main_taxids)
     fixed_corr = fix_corr(corr_info, blast_result, database_fasta_info)
     save_corr(fixed_corr, out_file)
 
