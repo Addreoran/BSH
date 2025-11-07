@@ -48,8 +48,8 @@ def read_corr(corr_file):
                         result[cluster_no][metabolite] = set()
                     result[cluster_no][metabolite].add(
                         CorrInfo(line=line.strip(), metabolite=data[0], cluster=data[1], pval=float(data[3]),
-                                 corr=float(data[3]), pair=data[2], metabo_values_list=data[4],
-                                 gene_values_list=data[5]))
+                                 corr=float(data[4]), pair=data[2], metabo_values_list=data[5],
+                                 gene_values_list=data[6]))
     return result
 
 
