@@ -22,7 +22,7 @@ class CorrInfo:
         self.ctrl = None
         self.fisher = None
         self.zou = None
-        self.lines=[]
+        self.lines = []
 
     def count(self):
         fisher = independent_corr(self.corr, self.ctrl.corr, len(self.metabo_values_list),
@@ -194,17 +194,16 @@ def independent_corr(xy, ab, n, n2=None, twotailed=True, conf_level=0.95, method
 
 
 def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
-    
     for cluster_no, metabolit_relation in corr_info.items():
         for metabolite, metabolite_cl_data in metabolit_relation.items():
             for corr_data in metabolite_cl_data:
-                line=corr_data.line
+                line = corr_data.line
                 if not save_old_line:
                     line = f"{corr_data.metabolite};{corr_data.cluster};{corr_data.pair};{corr_data.pval};{corr_data.corr}"
                     corr_data.line = line
                 if cluster_no in blast_result:
                     for e, i in enumerate(blast_result[cluster_no]['protein']):
-                        line=corr_data.line
+                        line = corr_data.line
                         print(blast_result[cluster_no]['protein'][e], blast_result[cluster_no])
                         line += f";{blast_result[cluster_no]['pident']}"
                         line += f";{blast_result[cluster_no]['protein'][e]}"
@@ -214,7 +213,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                         line += f";{database_info[blast_result[cluster_no]['protein'][e]]['protein_name']}"
                         line += f";{database_info[blast_result[cluster_no]['protein'][e]]['organism_name']}"
                         line += f";{database_info[blast_result[cluster_no]['protein'][e]]['organism_taxid']}"
-    
+
                         if corr_data.ctrl is not None:
                             line += f";{corr_data.ctrl.corr}"
                             line += f";{corr_data.ctrl.pval}"
@@ -224,7 +223,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                             line += f";{str(len(corr_data.metabo_values_list))}"
                             line += f";{str(len(corr_data.gene_values_list))}"
                         corr_data.lines.append(line)
-                        line=corr_data.line
+                        line = corr_data.line
                 else:
                     line += f";"
                     line += f";"
@@ -242,7 +241,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                         line += f";{str(len(corr_data.metabo_values_list))}"
                         line += f";{str(len(corr_data.gene_values_list))}"
                     corr_data.lines.append(line)
-                    line=corr_data.line
+                    line = corr_data.line
     return corr_info
 
 
@@ -268,24 +267,22 @@ def save_corr(fixed_corr, out_file):
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
 @click.option('--main_taxids', default="", help='Out file with genes statistics.')
 @click.option('--alfa', default=0.05, help='Out file with genes statistics.')
-
 def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main_taxids, alfa):
-    
     if main_taxids:
-        tmp_ids=set()
-        padj_no=0
+        tmp_ids = set()
+        padj_no = 0
         if os.path.exists(main_taxids):
             with open(main_taxids) as f:
                 for l in f:
                     if l.strip():
-                        line=l.split(";")
+                        line = l.split(";")
                         if "baseMean" in l:
-                            for e,i in enumerate(line):
-                                if i=="padj":
-                                    padj_no=e
-                        if float(line[padj_no])<alfa:
+                            for e, i in enumerate(line):
+                                if i == "padj":
+                                    padj_no = e
+                        if float(line[padj_no]) < alfa:
                             tmp_ids.add(line[0].replace("OTU", ""))
-        main_taxids=list(tmp_ids)
+        main_taxids = list(tmp_ids)
     blast_files = eval(blast_files)
     corr_info = read_corr(corr_file)
     if os.path.exists(corr_ctrl_file):
