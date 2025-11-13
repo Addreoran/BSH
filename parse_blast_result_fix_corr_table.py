@@ -203,7 +203,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                 if cluster_no in blast_result:
                     for e, i in enumerate(blast_result[cluster_no]['protein']):
                         line=corr_data.line
-                        print(blast_result[cluster_no]['protein'][e], blast_result[cluster_no]['protein'])
+                        print(blast_result[cluster_no]['protein'][e], blast_result[cluster_no])
                         line += f";{blast_result[cluster_no]['pident']}"
                         line += f";{blast_result[cluster_no]['protein'][e]}"
                         line += f";https://www.uniprot.org/uniprotkb/{blast_result[cluster_no]['protein'][e]}/entry"
