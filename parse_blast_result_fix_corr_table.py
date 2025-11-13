@@ -274,6 +274,7 @@ def save_corr(fixed_corr, out_file):
 @click.option('--main_taxids', default="", help='Out file with genes statistics.')
 @click.option('--alfa', default=0.05, help='Out file with genes statistics.')
 def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main_taxids, alfa):
+    print("main taxids")
     if main_taxids:
         tmp_ids = set()
         padj_no = 0
@@ -290,20 +291,29 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
                             tmp_ids.add(line[0].replace("OTU", ""))
         main_taxids = list(tmp_ids)
     blast_files = eval(blast_files)
+    print("read corr")
+
     corr_info = read_corr(corr_file)
+    print("read corr_cntrl")
+
     if os.path.exists(corr_ctrl_file):
         cntrl_corr_info = read_corr(corr_ctrl_file)
         corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
+
     blast_result = {}
     database_fasta_info = {}
     for fasta_db in fasta_databases.split(","):
         database_fasta_info = get_database_sequences_info(fasta_db, database_fasta_info)
     ncbi = NCBITaxa()
     # ncbi.update_taxonomy_database()
+    print("read blast results")
+
     for blast_table, description in blast_files.items():
         if blast_table:
             blast_result = read_blast_result(blast_table, description, database_fasta_info, ncbi, blast_result,
                                              main_taxids)
+    print("fix corr")
+
     fixed_corr = fix_corr(corr_info, blast_result, database_fasta_info)
     save_corr(fixed_corr, out_file)
 
