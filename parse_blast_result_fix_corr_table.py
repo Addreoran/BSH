@@ -255,6 +255,17 @@ def save_corr(fixed_corr, out_file):
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
 @click.option('--main_taxids', default="", help='Out file with genes statistics.')
 def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main_taxids):
+    
+    if main_taxids:
+        tmp_ids=set()
+        if os.path.exists(main_taxids):
+            with open(main_taxids) as f:
+                for l in f:
+                    if l.strip():
+                        tmp_ids.add(l.strip())
+        else:
+            main_taxids=main_taxids.split(",")
+    main_taxids=list(tmp_ids)
     blast_files = eval(blast_files)
     corr_info = read_corr(corr_file)
     import os
@@ -270,7 +281,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
     for blast_table, description in blast_files.items():
         if blast_table:
             blast_result = read_blast_result(blast_table, description, database_fasta_info, ncbi, blast_result,
-                                             main_taxids.split(","))
+                                             main_taxids)
     fixed_corr = fix_corr(corr_info, blast_result, database_fasta_info)
     save_corr(fixed_corr, out_file)
 
