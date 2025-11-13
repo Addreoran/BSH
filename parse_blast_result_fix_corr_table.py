@@ -125,8 +125,8 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                                     result[cl_no]["blast_table"].append(blast_table)
                                     result[cl_no]["eval"].append(eval)
                             else:
-                                result[cl_no] = {"pident": pident, "protein": protein, "description": description,
-                                                 "blast_table": blast_table, "eval": eval}
+                                result[cl_no] = {"pident": pident, "protein": [protein], "description": [description],
+                                                 "blast_table": [blast_table], "eval": [eval]}
                     except:
                         if cl_no in result:
                             if result[cl_no]["pident"] < pident:
