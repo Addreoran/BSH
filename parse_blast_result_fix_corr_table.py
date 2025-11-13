@@ -201,7 +201,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     line = f"{corr_data.metabolite};{corr_data.cluster};{corr_data.pair};{corr_data.pval};{corr_data.corr}"
                     corr_data.line = line
                 if cluster_no in blast_result:
-                    for e, i in blast_result[cluster_no]['protein']:
+                    for e, i in enumerate(blast_result[cluster_no]['protein']):
                         line=corr_data.line
                         line += f";{blast_result[cluster_no]['pident']}"
                         line += f";{blast_result[cluster_no]['protein'][e]}"
