@@ -228,9 +228,10 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     # line += f";https://www.uniprot.org/uniprotkb/{blast_result[cluster_no]['protein'][e]}/entry"
                     line += f";{','.join(blast_result[cluster_no]['description'])}"
                     line += f";{','.join(blast_result[cluster_no]['blast_table'])}"
-                    line += f";{','.join([i['protein_name'] for i in database_info[blast_result[cluster_no]['protein']]])}"
-                    line += f";{','.join([i['organism_name'] for i in database_info[blast_result[cluster_no]['protein']]])}"
-                    line += f";{','.join([i['organism_taxid'] for i in database_info[blast_result[cluster_no]['protein']]])}"
+                    line += f";{','.join([database_info[i]['protein_name'] for i in blast_result[cluster_no]['protein']])}"
+                    line += f";{','.join([database_info[i]['organism_name'] for i in blast_result[cluster_no]['protein']])}"
+                    line += f";{','.join([database_info[i]['organism_taxid'] for i in blast_result[cluster_no]['protein']])}"
+
 
                     if corr_data.ctrl is not None:
                         line += f";{corr_data.ctrl.corr}"
