@@ -221,29 +221,28 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     line = f"{corr_data.metabolite};{corr_data.cluster};{corr_data.pair};{corr_data.pval};{corr_data.corr}"
                     corr_data.line = line
                 if cluster_no in blast_result:
-                    for e, i in enumerate(blast_result[cluster_no]['protein']):
-                        line = corr_data.line
-                        print(blast_result[cluster_no]['protein'][e], blast_result[cluster_no])
-                        line += f";{blast_result[cluster_no]['pident']}"
-                        line += f";{blast_result[cluster_no]['protein'][e]}"
-                        line += f";https://www.uniprot.org/uniprotkb/{blast_result[cluster_no]['protein'][e]}/entry"
-                        line += f";{blast_result[cluster_no]['description'][e]}"
-                        line += f";{blast_result[cluster_no]['blast_table'][e]}"
-                        line += f";{database_info[blast_result[cluster_no]['protein'][e]]['protein_name']}"
-                        line += f";{database_info[blast_result[cluster_no]['protein'][e]]['organism_name']}"
-                        line += f";{database_info[blast_result[cluster_no]['protein'][e]]['organism_taxid']}"
+                    line = corr_data.line
+                    print(blast_result[cluster_no]['protein'], blast_result[cluster_no])
+                    line += f";{blast_result[cluster_no]['pident']}"
+                    line += f";{','.join(blast_result[cluster_no]['protein'])}"
+                    # line += f";https://www.uniprot.org/uniprotkb/{blast_result[cluster_no]['protein'][e]}/entry"
+                    line += f";{','.join(blast_result[cluster_no]['description'])}"
+                    line += f";{','.join(blast_result[cluster_no]['blast_table'])}"
+                    line += f";{','.join([i['protein_name'] for i in database_info[blast_result[cluster_no]['protein']]])}"
+                    line += f";{','.join([i['organism_name'] for i in database_info[blast_result[cluster_no]['protein']]])}"
+                    line += f";{','.join([i['organism_taxid'] for i in database_info[blast_result[cluster_no]['protein']]])}"
 
-                        if corr_data.ctrl is not None:
-                            line += f";{corr_data.ctrl.corr}"
-                            line += f";{corr_data.ctrl.pval}"
-                            line += f";{corr_data.zou}"
-                            line += f";{corr_data.fisher}"
-                            line += f";{corr_data.fisher}"
-                            line += f";{str(len(corr_data.metabo_values_list))}"
-                            line += f";{str(len(corr_data.gene_values_list))}"
-                        # corr_data.lines.append(line)
-                        yield line
-                        line = corr_data.line
+                    if corr_data.ctrl is not None:
+                        line += f";{corr_data.ctrl.corr}"
+                        line += f";{corr_data.ctrl.pval}"
+                        line += f";{corr_data.zou}"
+                        line += f";{corr_data.fisher}"
+                        line += f";{corr_data.fisher}"
+                        line += f";{str(len(corr_data.metabo_values_list))}"
+                        line += f";{str(len(corr_data.gene_values_list))}"
+                    # corr_data.lines.append(line)
+                    yield line
+                    line = corr_data.line
                 else:
                     line += f";"
                     line += f";"
