@@ -102,7 +102,6 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
     # 5857992;4123967_2       tr|E3ZSC8|E3ZSC8_LISSE  57.143  112     48      0       1       112     1       112     2.67e-45        145
     if result is None:
         result = {}
-    all_proteins = set()
     with open(blast_table) as f:
         for l in f:
             line = l.strip()
@@ -110,7 +109,6 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                 line = line.split()
                 cl_no = line[0].split(";")[0]
                 protein = line[1].split("|")[1]
-                all_proteins.add(protein)
                 pident = float(line[2])
                 eval = float(line[10])
                 # print(database_fasta_info[protein]['organism_taxid'])
@@ -160,7 +158,7 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                         else:
                             result[cl_no] = {"pident": pident, "protein": [protein], "description": [description],
                                              "blast_table": [blast_table]}
-    return result, all_proteins
+    return result
 
 
 import numpy as np
