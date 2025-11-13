@@ -254,18 +254,25 @@ def save_corr(fixed_corr, out_file):
 @click.option('--fasta_databases', default="./", help='')
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
 @click.option('--main_taxids', default="", help='Out file with genes statistics.')
-def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main_taxids):
+@click.option('--alfa', default=0.05, help='Out file with genes statistics.')
+
+def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main_taxids, alfa):
     
     if main_taxids:
         tmp_ids=set()
+        padj_no=0
         if os.path.exists(main_taxids):
             with open(main_taxids) as f:
                 for l in f:
                     if l.strip():
-                        tmp_ids.add(l.strip())
-        else:
-            main_taxids=main_taxids.split(",")
-    main_taxids=list(tmp_ids)
+                        line=l.split(";")
+                        if "baseMean" in l:
+                            for e,i in enumerate(line):
+                                if i=="padj":
+                                    padj_no=e
+                        if float(line[padj_no])<alfa:
+                            tmp_ids.add(line[0].replace("OTU", ""))
+        main_taxids=list(tmp_ids)
     blast_files = eval(blast_files)
     corr_info = read_corr(corr_file)
     import os
