@@ -327,6 +327,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
     for blast_table, description in blast_files.items():
         if blast_table:
             all_proteins = read_proteins_in_analyse(blast_table, all_proteins)
+    print(len(list(all_proteins)))
     for fasta_db in fasta_databases.split(","):
         database_fasta_info = get_database_sequences_info(fasta_db, all_proteins, database_fasta_info)
     ncbi = NCBITaxa()
