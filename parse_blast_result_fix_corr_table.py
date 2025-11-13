@@ -238,7 +238,6 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                         line += f";{corr_data.ctrl.pval}"
                         line += f";{corr_data.zou}"
                         line += f";{corr_data.fisher}"
-                        line += f";{corr_data.fisher}"
                         line += f";{str(len(corr_data.metabo_values_list))}"
                         line += f";{str(len(corr_data.gene_values_list))}"
                     # corr_data.lines.append(line)
