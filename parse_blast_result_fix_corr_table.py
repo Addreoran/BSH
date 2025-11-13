@@ -64,25 +64,29 @@ def compare_cntrl_corr(corr_file, cntrl_corr_info):
     return corr_file
 
 
-def get_database_sequences_info(fasta_database, result={}):
+def get_database_sequences_info(fasta_database, protein_names={}, result={}):
     with open(fasta_database) as f:
         for l in f:
             line = l.strip()
             if line.startswith(">"):
                 uniprot_id = line.split("|")[1]
-                protein_name = line.split("OS=")[0].split(" ", 1)[-1]
-                organism_name = line.split("OS=", 1)[1].split("OX=")[0]
-                organism_taxid = line.split("OX=")[-1].split(" ")[0]
-                result[uniprot_id] = {"protein_name": protein_name, "organism_name": organism_name,
-                                      "organism_taxid": organism_taxid}
+                if protein_names:
+                    if uniprot_id in protein_names:
+                        protein_name = line.split("OS=")[0].split(" ", 1)[-1]
+                        organism_name = line.split("OS=", 1)[1].split("OX=")[0]
+                        organism_taxid = line.split("OX=")[-1].split(" ")[0]
+                        result[uniprot_id] = {"protein_name": protein_name, "organism_name": organism_name,
+                                              "organism_taxid": organism_taxid}
+                else:
+                    protein_name = line.split("OS=")[0].split(" ", 1)[-1]
+                    organism_name = line.split("OS=", 1)[1].split("OX=")[0]
+                    organism_taxid = line.split("OX=")[-1].split(" ")[0]
+                    result[uniprot_id] = {"protein_name": protein_name, "organism_name": organism_name,
+                                          "organism_taxid": organism_taxid}
     return result
 
 
-def read_blast_result(blast_table, description, database_fasta_info, ncbi, result=None, main_taxids=None):
-    # 5857992;4123967_2       tr|E3ZSC8|E3ZSC8_LISSE  57.143  112     48      0       1       112     1       112     2.67e-45        145
-    if result is None:
-        result = {}
-
+def read_proteins_in_analyse(blast_table, all_proteins):
     with open(blast_table) as f:
         for l in f:
             line = l.strip()
@@ -90,6 +94,23 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                 line = line.split()
                 cl_no = line[0].split(";")[0]
                 protein = line[1].split("|")[1]
+                all_proteins.add(protein)
+    return all_proteins
+
+
+def read_blast_result(blast_table, description, database_fasta_info, ncbi, result=None, main_taxids=None):
+    # 5857992;4123967_2       tr|E3ZSC8|E3ZSC8_LISSE  57.143  112     48      0       1       112     1       112     2.67e-45        145
+    if result is None:
+        result = {}
+    all_proteins = set()
+    with open(blast_table) as f:
+        for l in f:
+            line = l.strip()
+            if line:
+                line = line.split()
+                cl_no = line[0].split(";")[0]
+                protein = line[1].split("|")[1]
+                all_proteins.add(protein)
                 pident = float(line[2])
                 eval = float(line[10])
                 # print(database_fasta_info[protein]['organism_taxid'])
@@ -101,7 +122,7 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                                 result[cl_no]["protein"] = [protein]
                                 result[cl_no]["description"] = [description]
                                 result[cl_no]["blast_table"] = [blast_table]
-                                result[cl_no]["eval"] = eval
+                                result[cl_no]["eval"] = [eval]
                             if result[cl_no]["pident"] == pident:
                                 if protein not in result[cl_no]["protein"]:
                                     result[cl_no]["pident"] = pident
@@ -139,7 +160,7 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                         else:
                             result[cl_no] = {"pident": pident, "protein": [protein], "description": [description],
                                              "blast_table": [blast_table]}
-    return result
+    return result, all_proteins
 
 
 import numpy as np
@@ -299,11 +320,15 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
     if os.path.exists(corr_ctrl_file):
         cntrl_corr_info = read_corr(corr_ctrl_file)
         corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
-
+    print("read sequences info")
     blast_result = {}
     database_fasta_info = {}
+    all_proteins = set()
+    for blast_table, description in blast_files.items():
+        if blast_table:
+            all_proteins = read_proteins_in_analyse(blast_table, all_proteins)
     for fasta_db in fasta_databases.split(","):
-        database_fasta_info = get_database_sequences_info(fasta_db, database_fasta_info)
+        database_fasta_info = get_database_sequences_info(fasta_db, all_proteins, database_fasta_info)
     ncbi = NCBITaxa()
     # ncbi.update_taxonomy_database()
     print("read blast results")
