@@ -252,7 +252,6 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     line += f";"
                     line += f";"
                     line += f";"
-                    line += f";"
                     if corr_data.ctrl is not None:
                         line += f";{corr_data.ctrl.corr}"
                         line += f";{corr_data.ctrl.pval}"
