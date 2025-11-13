@@ -115,13 +115,12 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                         if 2759 not in lineage:
                             if cl_no in result:
                                 if result[cl_no]["pident"] < pident:
-                                    result[cl_no]["pident"] = [pident]
+                                    result[cl_no]["pident"] = pident
                                     result[cl_no]["protein"] = [protein]
                                     result[cl_no]["description"] = [description]
                                     result[cl_no]["blast_table"] = [blast_table]
                                     result[cl_no]["eval"] = [eval]
                                 if result[cl_no]["pident"] == pident:
-                                    result[cl_no]["pident"].append(pident)
                                     result[cl_no]["protein"].append(protein)
                                     result[cl_no]["description"].append(description)
                                     result[cl_no]["blast_table"].append(blast_table)
@@ -132,12 +131,12 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                     except:
                         if cl_no in result:
                             if result[cl_no]["pident"] < pident:
-                                result[cl_no]["pident"] = [pident]
+                                result[cl_no]["pident"] = pident
                                 result[cl_no]["protein"] = [protein]
                                 result[cl_no]["description"] = [description]
                                 result[cl_no]["blast_table"] = [blast_table]
                         else:
-                            result[cl_no] = {"pident": [pident], "protein": [protein], "description": [description],
+                            result[cl_no] = {"pident": pident, "protein": [protein], "description": [description],
                                              "blast_table": [blast_table]}
     return result
 
@@ -203,16 +202,16 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     line = f"{corr_data.metabolite};{corr_data.cluster};{corr_data.pair};{corr_data.pval};{corr_data.corr}"
                     corr_data.line = line
                 if cluster_no in blast_result:
-                    for e, i in database_info[blast_result[cluster_no]['protein']]:
+                    for e, i in blast_result[cluster_no]['protein']:
                         line=corr_data.line
                         line += f";{blast_result[cluster_no]['pident']}"
-                        line += f";{blast_result[cluster_no]['protein']}"
-                        line += f";https://www.uniprot.org/uniprotkb/{blast_result[cluster_no]['protein']}/entry"
-                        line += f";{blast_result[cluster_no]['description']}"
-                        line += f";{blast_result[cluster_no]['blast_table']}"
-                        line += f";{database_info[blast_result[cluster_no]['protein']][e]['protein_name']}"
-                        line += f";{database_info[blast_result[cluster_no]['protein']][e]['organism_name']}"
-                        line += f";{database_info[blast_result[cluster_no]['protein']][e]['organism_taxid']}"
+                        line += f";{blast_result[cluster_no]['protein'][e]}"
+                        line += f";https://www.uniprot.org/uniprotkb/{blast_result[cluster_no]['protein'][e]}/entry"
+                        line += f";{blast_result[cluster_no]['description'][e]}"
+                        line += f";{blast_result[cluster_no]['blast_table'][e]}"
+                        line += f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
+                        line += f";{database_info[blast_result[cluster_no]['protein']]['organism_name']}"
+                        line += f";{database_info[blast_result[cluster_no]['protein']]['organism_taxid']}"
     
                         if corr_data.ctrl is not None:
                             line += f";{corr_data.ctrl.corr}"
