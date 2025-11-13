@@ -64,7 +64,7 @@ def compare_cntrl_corr(corr_file, cntrl_corr_info):
     return corr_file
 
 
-def get_database_sequences_info(fasta_database, protein_names={}, result={}):
+def get_database_sequences_info(fasta_database, protein_names=set(), result=dict()):
     with open(fasta_database) as f:
         for l in f:
             line = l.strip()
@@ -321,8 +321,8 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
         cntrl_corr_info = read_corr(corr_ctrl_file)
         corr_info = compare_cntrl_corr(corr_info, cntrl_corr_info)
     print("read sequences info")
-    blast_result = {}
-    database_fasta_info = {}
+    blast_result = dict()
+    database_fasta_info = dict()
     all_proteins = set()
     for blast_table, description in blast_files.items():
         if blast_table:
