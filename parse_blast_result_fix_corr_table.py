@@ -104,7 +104,7 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                                 result[cl_no]["eval"] = eval
                             if result[cl_no]["pident"] == pident:
                                 if protein not in result[cl_no]["protein"]:
-                                result[cl_no]["pident"] = pident
+                                    result[cl_no]["pident"] = pident
                                     result[cl_no]["protein"].append(protein)
                                     result[cl_no]["description"].append(description)
                                     result[cl_no]["blast_table"].append(blast_table)
