@@ -98,17 +98,16 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                         if cl_no in result:
                             if result[cl_no]["pident"] < pident:
                                 result[cl_no]["pident"] = pident
-                                result[cl_no]["protein"] = protein
-                                result[cl_no]["description"] = description
-                                result[cl_no]["blast_table"] = blast_table
+                                result[cl_no]["protein"] = [protein]
+                                result[cl_no]["description"] = [description]
+                                result[cl_no]["blast_table"] = [blast_table]
                                 result[cl_no]["eval"] = eval
                             if result[cl_no]["pident"] == pident:
-                                if eval < result[cl_no]["eval"]:
-                                    result[cl_no]["pident"] = pident
-                                    result[cl_no]["protein"] = protein
-                                    result[cl_no]["description"] = description
-                                    result[cl_no]["blast_table"] = blast_table
-                                    result[cl_no]["eval"] = eval
+                                result[cl_no]["pident"] = pident
+                                result[cl_no]["protein"].append(protein)
+                                result[cl_no]["description"].append(description)
+                                result[cl_no]["blast_table"].append(blast_table)
+                                result[cl_no]["eval"].append(eval)
                 else:
                     try:
                         lineage = ncbi.get_lineage(database_fasta_info[protein]['organism_taxid'])
