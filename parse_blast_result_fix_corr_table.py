@@ -211,7 +211,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                         line += f";{blast_result[cluster_no]['blast_table'][e]}"
                         line += f";{database_info[blast_result[cluster_no]['protein'][e]]['protein_name']}"
                         line += f";{database_info[blast_result[cluster_no]['protein'][e]]['organism_name']}"
-                        line += f";{database_info[blast_result[cluster_no]['protein']][e]['organism_taxid']}"
+                        line += f";{database_info[blast_result[cluster_no]['protein'][e]]['organism_taxid']}"
     
                         if corr_data.ctrl is not None:
                             line += f";{corr_data.ctrl.corr}"
