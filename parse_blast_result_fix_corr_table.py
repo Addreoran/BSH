@@ -22,6 +22,7 @@ class CorrInfo:
         self.ctrl = None
         self.fisher = None
         self.zou = None
+        self.lines=[]
 
     def count(self):
         fisher = independent_corr(self.corr, self.ctrl.corr, len(self.metabo_values_list),
@@ -114,31 +115,30 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                         if 2759 not in lineage:
                             if cl_no in result:
                                 if result[cl_no]["pident"] < pident:
-                                    result[cl_no]["pident"] = pident
-                                    result[cl_no]["protein"] = protein
-                                    result[cl_no]["description"] = description
-                                    result[cl_no]["blast_table"] = blast_table
-                                    result[cl_no]["eval"] = eval
+                                    result[cl_no]["pident"] = [pident]
+                                    result[cl_no]["protein"] = [protein]
+                                    result[cl_no]["description"] = [description]
+                                    result[cl_no]["blast_table"] = [blast_table]
+                                    result[cl_no]["eval"] = [eval]
                                 if result[cl_no]["pident"] == pident:
-                                    if eval < result[cl_no]["eval"]:
-                                        result[cl_no]["pident"] = pident
-                                        result[cl_no]["protein"] = protein
-                                        result[cl_no]["description"] = description
-                                        result[cl_no]["blast_table"] = blast_table
-                                        result[cl_no]["eval"] = eval
+                                    result[cl_no]["pident"].append(pident)
+                                    result[cl_no]["protein"].append(protein)
+                                    result[cl_no]["description"].append(description)
+                                    result[cl_no]["blast_table"].append(blast_table)
+                                    result[cl_no]["eval"].append(eval)
                             else:
                                 result[cl_no] = {"pident": pident, "protein": protein, "description": description,
                                                  "blast_table": blast_table, "eval": eval}
                     except:
                         if cl_no in result:
                             if result[cl_no]["pident"] < pident:
-                                result[cl_no]["pident"] = pident
-                                result[cl_no]["protein"] = protein
-                                result[cl_no]["description"] = description
-                                result[cl_no]["blast_table"] = blast_table
+                                result[cl_no]["pident"] = [pident]
+                                result[cl_no]["protein"] = [protein]
+                                result[cl_no]["description"] = [description]
+                                result[cl_no]["blast_table"] = [blast_table]
                         else:
-                            result[cl_no] = {"pident": pident, "protein": protein, "description": description,
-                                             "blast_table": blast_table}
+                            result[cl_no] = {"pident": [pident], "protein": [protein], "description": [description],
+                                             "blast_table": [blast_table]}
     return result
 
 
@@ -194,47 +194,54 @@ def independent_corr(xy, ab, n, n2=None, twotailed=True, conf_level=0.95, method
 
 
 def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
+    
     for cluster_no, metabolit_relation in corr_info.items():
         for metabolite, metabolite_cl_data in metabolit_relation.items():
             for corr_data in metabolite_cl_data:
-
+                line=corr_data.line
                 if not save_old_line:
                     line = f"{corr_data.metabolite};{corr_data.cluster};{corr_data.pair};{corr_data.pval};{corr_data.corr}"
                     corr_data.line = line
                 if cluster_no in blast_result:
-                    corr_data.line += f";{blast_result[cluster_no]['pident']}"
-                    corr_data.line += f";{blast_result[cluster_no]['protein']}"
-                    corr_data.line += f";https://www.uniprot.org/uniprotkb/{blast_result[cluster_no]['protein']}/entry"
-                    corr_data.line += f";{blast_result[cluster_no]['description']}"
-                    corr_data.line += f";{blast_result[cluster_no]['blast_table']}"
-                    corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['protein_name']}"
-                    corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['organism_name']}"
-                    corr_data.line += f";{database_info[blast_result[cluster_no]['protein']]['organism_taxid']}"
-
-                    if corr_data.ctrl is not None:
-                        corr_data.line += f";{corr_data.ctrl.corr}"
-                        corr_data.line += f";{corr_data.ctrl.pval}"
-                        corr_data.line += f";{corr_data.zou}"
-                        corr_data.line += f";{corr_data.fisher}"
-                        corr_data.line += f";{corr_data.fisher}"
-                        corr_data.line += f";{str(len(corr_data.metabo_values_list))}"
-                        corr_data.line += f";{str(len(corr_data.gene_values_list))}"
+                    for e, i in database_info[blast_result[cluster_no]['protein']]:
+                        line=corr_data.line
+                        line += f";{blast_result[cluster_no]['pident']}"
+                        line += f";{blast_result[cluster_no]['protein']}"
+                        line += f";https://www.uniprot.org/uniprotkb/{blast_result[cluster_no]['protein']}/entry"
+                        line += f";{blast_result[cluster_no]['description']}"
+                        line += f";{blast_result[cluster_no]['blast_table']}"
+                        line += f";{database_info[blast_result[cluster_no]['protein']][e]['protein_name']}"
+                        line += f";{database_info[blast_result[cluster_no]['protein']][e]['organism_name']}"
+                        line += f";{database_info[blast_result[cluster_no]['protein']][e]['organism_taxid']}"
+    
+                        if corr_data.ctrl is not None:
+                            line += f";{corr_data.ctrl.corr}"
+                            line += f";{corr_data.ctrl.pval}"
+                            line += f";{corr_data.zou}"
+                            line += f";{corr_data.fisher}"
+                            line += f";{corr_data.fisher}"
+                            line += f";{str(len(corr_data.metabo_values_list))}"
+                            line += f";{str(len(corr_data.gene_values_list))}"
+                        corr_data.lines.append(line)
+                        line=corr_data.line
                 else:
-                    corr_data.line += f";"
-                    corr_data.line += f";"
-                    corr_data.line += f";"
-                    corr_data.line += f";"
-                    corr_data.line += f";"
-                    corr_data.line += f";"
-                    corr_data.line += f";"
-                    corr_data.line += f";"
+                    line += f";"
+                    line += f";"
+                    line += f";"
+                    line += f";"
+                    line += f";"
+                    line += f";"
+                    line += f";"
+                    line += f";"
                     if corr_data.ctrl is not None:
-                        corr_data.line += f";{corr_data.ctrl.corr}"
-                        corr_data.line += f";{corr_data.ctrl.pval}"
-                        corr_data.line += f";{corr_data.zou}"
-                        corr_data.line += f";{corr_data.fisher}"
-                        corr_data.line += f";{str(len(corr_data.metabo_values_list))}"
-                        corr_data.line += f";{str(len(corr_data.gene_values_list))}"
+                        line += f";{corr_data.ctrl.corr}"
+                        line += f";{corr_data.ctrl.pval}"
+                        line += f";{corr_data.zou}"
+                        line += f";{corr_data.fisher}"
+                        line += f";{str(len(corr_data.metabo_values_list))}"
+                        line += f";{str(len(corr_data.gene_values_list))}"
+                    corr_data.lines.append(line)
+                    line=corr_data.line
     return corr_info
 
 
@@ -243,8 +250,13 @@ def save_corr(fixed_corr, out_file):
         for cluset_no, metabolit_relation in fixed_corr.items():
             for metabolite, metabolite_cl_data in metabolit_relation.items():
                 for corr_data in metabolite_cl_data:
-                    f.write(corr_data.line)
-                    f.write("\n")
+                    if corr_data.lines:
+                        for line in corr_data.lines:
+                            f.write(line)
+                            f.write("\n")
+                    else:
+                        f.write(corr_data.line)
+                        f.write("\n")
 
 
 @click.command()
