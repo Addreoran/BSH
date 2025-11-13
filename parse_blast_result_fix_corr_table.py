@@ -222,7 +222,8 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                             line += f";{corr_data.fisher}"
                             line += f";{str(len(corr_data.metabo_values_list))}"
                             line += f";{str(len(corr_data.gene_values_list))}"
-                        corr_data.lines.append(line)
+                        # corr_data.lines.append(line)
+                        yield line
                         line = corr_data.line
                 else:
                     line += f";"
@@ -240,23 +241,28 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                         line += f";{corr_data.fisher}"
                         line += f";{str(len(corr_data.metabo_values_list))}"
                         line += f";{str(len(corr_data.gene_values_list))}"
-                    corr_data.lines.append(line)
+                    # corr_data.lines.append(line)
+                    yield line
                     line = corr_data.line
     return corr_info
 
 
 def save_corr(fixed_corr, out_file):
     with open(out_file, "w") as f:
-        for cluset_no, metabolit_relation in fixed_corr.items():
-            for metabolite, metabolite_cl_data in metabolit_relation.items():
-                for corr_data in metabolite_cl_data:
-                    if corr_data.lines:
-                        for line in corr_data.lines:
-                            f.write(line)
-                            f.write("\n")
-                    else:
-                        f.write(corr_data.line)
-                        f.write("\n")
+        for line in fixed_corr:
+            f.write(line)
+            f.write("\n")
+    # with open(out_file, "w") as f:
+    #     for cluset_no, metabolit_relation in fixed_corr.items():
+    #         for metabolite, metabolite_cl_data in metabolit_relation.items():
+    #             for corr_data in metabolite_cl_data:
+    #                 if corr_data.lines:
+    #                     for line in corr_data.lines:
+    #                         f.write(line)
+    #                         f.write("\n")
+    #                 else:
+    #                     f.write(corr_data.line)
+    #                     f.write("\n")
 
 
 @click.command()
