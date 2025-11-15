@@ -300,7 +300,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
                 for l in f:
                     if l.strip():
                         line = l.split(";")
-                        if "baseMean" in l:
+                        if "Species" in l:
                             for e, i in enumerate(line):
                                 if i == "padj":
                                     padj_no = e
