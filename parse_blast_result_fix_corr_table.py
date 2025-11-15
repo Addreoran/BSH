@@ -300,12 +300,18 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
                 for l in f:
                     if l.strip():
                         line = l.split(";")
-                        if "Species" in l:
-                            for e, i in enumerate(line):
-                                if i == "padj":
-                                    padj_no = e
-                        if float(line[padj_no]) < alfa:
-                            tmp_ids.add(line[0].replace("OTU", ""))
+                        print(line
+                        )
+                        if line[0]:
+                            if "Species" in l:
+                                for e, i in enumerate(line):
+                                    if i == "padj":
+                                        padj_no = e
+                                    
+                        #print(padj_no, line, line[padj_no])
+                            elif float(line[padj_no].replace(',', '.'))< alfa:
+                            
+                                tmp_ids.add(line[0].replace("OTU", ""))
         main_taxids = list(tmp_ids)
     blast_files = eval(blast_files)
     print("read corr")
