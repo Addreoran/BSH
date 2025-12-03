@@ -299,7 +299,7 @@ def save_corr(fixed_corr, out_file):
 
 @click.command()
 @click.option('--corr_file', default="./", help='Folder with BLAST files.')
-@click.option('--corr_ctrl_file', default="./", help='Folder with BLAST files.')
+@click.option('--corr_ctrl_file', default="", help='Folder with BLAST files.')
 @click.option('--blast_files', default={}, help='')
 @click.option('--fasta_databases', default="./", help='')
 @click.option('--out_file', default="./", help='Out file with genes statistics.')
