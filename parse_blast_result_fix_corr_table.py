@@ -98,7 +98,7 @@ def read_proteins_in_analyse(blast_table, all_proteins):
     return all_proteins
 
 
-def read_blast_result(blast_table, description, database_fasta_info, ncbi, result=None, main_taxids=None):
+def read_blast_result(blast_table, description, database_fasta_info, ncbi, result=None, main_taxids=None, representation_main_taxids=None):
     # 5857992;4123967_2       tr|E3ZSC8|E3ZSC8_LISSE  57.143  112     48      0       1       112     1       112     2.67e-45        145
     if result is None:
         result = {}
@@ -127,6 +127,8 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                                 result[cl_no]["description"] = [description]
                                 result[cl_no]["blast_table"] = [blast_table]
                                 result[cl_no]["eval"] = [eval]
+                                result[cl_no]["representation"] = [representation[list(set(lineage).intersection(set(main_taxids)))[0]]]
+
                             if result[cl_no]["pident"] == pident:
                                 if protein not in result[cl_no]["protein"]:
                                     result[cl_no]["pident"] = pident
@@ -134,9 +136,12 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                                     result[cl_no]["description"].append(description)
                                     result[cl_no]["blast_table"].append(blast_table)
                                     result[cl_no]["eval"].append(eval)
+                                    result[cl_no]["representation"].append(representation[list(set(lineage).intersection(set(main_taxids)))[0]])
+
                         else:
                             result[cl_no] = {"pident": pident, "protein": [protein], "description": [description],
-                                                                                         "blast_table": [blast_table], "eval": [eval]}
+                                                                                         "blast_table": [blast_table], "eval": [eval], 
+                                            "representation":[representation[list(set(lineage).intersection(set(main_taxids)))[0]]]}
                 else:
                     try:
                         lineage = ncbi.get_lineage(database_fasta_info[protein]['organism_taxid'])
@@ -240,7 +245,8 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     line += f";{','.join([database_info[i]['protein_name'] for i in blast_result[cluster_no]['protein']])}"
                     line += f";{','.join([database_info[i]['organism_name'] for i in blast_result[cluster_no]['protein']])}"
                     line += f";{','.join([database_info[i]['organism_taxid'] for i in blast_result[cluster_no]['protein']])}"
-
+                    if "representation" in blast_result[cluster_no]:
+                        line+=f";{'|'.join(blast_result[cluster_no]['representation'])}"
 
                     if corr_data.ctrl is not None:
                         line += f";{corr_data.ctrl.corr}"
@@ -301,7 +307,9 @@ def save_corr(fixed_corr, out_file):
 @click.option('--alfa', default=0.05, help='Out file with genes statistics.')
 def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main_taxids, alfa):
     print("main taxids")
+    main_taxids_representation={}
     if main_taxids:
+        
         tmp_ids = set()
         padj_no = 0
         if os.path.exists(main_taxids):
@@ -319,6 +327,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
                                     
                         #print(padj_no, line, line[padj_no])
                             elif float(line[4].replace(',', '.'))< alfa:
+                                main_taxids_representation[int(line[1].replace("OTU", "").replace('"', ''))]=l.strip()
                             
                                 tmp_ids.add(int(line[1].replace("OTU", "").replace('"', '')))
                                 print(tmp_ids)
@@ -350,7 +359,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
     for blast_table, description in blast_files.items():
         if blast_table:
             blast_result = read_blast_result(blast_table, description, database_fasta_info, ncbi, blast_result,
-                                             main_taxids)
+                                             main_taxids, main_taxids_representation)
     print("fix corr")
 
     fixed_corr = fix_corr(corr_info, blast_result, database_fasta_info)
