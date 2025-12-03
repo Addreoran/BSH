@@ -127,7 +127,7 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                                 result[cl_no]["description"] = [description]
                                 result[cl_no]["blast_table"] = [blast_table]
                                 result[cl_no]["eval"] = [eval]
-                                result[cl_no]["representation"] = [representation[list(set(lineage).intersection(set(main_taxids)))[0]]]
+                                result[cl_no]["representation"] = [representation_main_taxids[list(set(lineage).intersection(set(main_taxids)))[0]]]
 
                             if result[cl_no]["pident"] == pident:
                                 if protein not in result[cl_no]["protein"]:
@@ -136,12 +136,12 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                                     result[cl_no]["description"].append(description)
                                     result[cl_no]["blast_table"].append(blast_table)
                                     result[cl_no]["eval"].append(eval)
-                                    result[cl_no]["representation"].append(representation[list(set(lineage).intersection(set(main_taxids)))[0]])
+                                    result[cl_no]["representation"].append(representation_main_taxids[list(set(lineage).intersection(set(main_taxids)))[0]])
 
                         else:
                             result[cl_no] = {"pident": pident, "protein": [protein], "description": [description],
                                                                                          "blast_table": [blast_table], "eval": [eval], 
-                                            "representation":[representation[list(set(lineage).intersection(set(main_taxids)))[0]]]}
+                                            "representation":[representation_main_taxids[list(set(lineage).intersection(set(main_taxids)))[0]]]}
                 else:
                     try:
                         lineage = ncbi.get_lineage(database_fasta_info[protein]['organism_taxid'])
