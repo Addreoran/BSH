@@ -327,7 +327,7 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
                                     
                         #print(padj_no, line, line[padj_no])
                             elif float(line[4].replace(',', '.'))< alfa:
-                                main_taxids_representation[int(line[1].replace("OTU", "").replace('"', ''))]=l.strip()
+                                main_taxids_representation[int(line[1].replace("OTU", "").replace('"', ''))]=l.strip().replace(",", ".").replace(";", ",")
                             
                                 tmp_ids.add(int(line[1].replace("OTU", "").replace('"', '')))
                                 print(tmp_ids)
