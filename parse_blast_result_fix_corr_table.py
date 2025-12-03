@@ -246,7 +246,7 @@ def fix_corr(corr_info, blast_result, database_info, save_old_line=True):
                     line += f";{','.join([database_info[i]['organism_name'] for i in blast_result[cluster_no]['protein']])}"
                     line += f";{','.join([database_info[i]['organism_taxid'] for i in blast_result[cluster_no]['protein']])}"
                     if "representation" in blast_result[cluster_no]:
-                        line+=f";{'|'.join(list(set(blast_result[cluster_no]['representation'])))}"
+                        line+='"'+f";{'|'.join(list(set(blast_result[cluster_no]['representation'])))}"+'"'
 
                     if corr_data.ctrl is not None:
                         line += f";{corr_data.ctrl.corr}"
