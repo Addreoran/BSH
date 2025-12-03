@@ -113,8 +113,13 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                 eval = float(line[10])
                 # print(database_fasta_info[protein]['organism_taxid'])
                 if main_taxids:
-                    if database_fasta_info[protein]['organism_taxid'] in main_taxids:
+                    lineage =ncbi.get_lineage(database_fasta_info[protein]['organism_taxid'])
+                    print("protein info", protein, database_fasta_info[protein]['organism_taxid'], database_fasta_info[protein]['organism_taxid'] in main_taxids, lineage, set(lineage).intersection(set(main_taxids)))
+                    
+                    if set(lineage).intersection(set(main_taxids)):
+                        print("jest", cl_no in result)
                         if cl_no in result:
+                            print("jest2", result[cl_no], pident)
                             if result[cl_no]["pident"] < pident:
                                 result[cl_no]["pident"] = pident
                                 result[cl_no]["protein"] = [protein]
@@ -128,6 +133,9 @@ def read_blast_result(blast_table, description, database_fasta_info, ncbi, resul
                                     result[cl_no]["description"].append(description)
                                     result[cl_no]["blast_table"].append(blast_table)
                                     result[cl_no]["eval"].append(eval)
+                        else:
+                            result[cl_no] = {"pident": pident, "protein": [protein], "description": [description],
+                                                                                         "blast_table": [blast_table], "eval": [eval]}
                 else:
                     try:
                         lineage = ncbi.get_lineage(database_fasta_info[protein]['organism_taxid'])
@@ -300,19 +308,21 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
                 for l in f:
                     if l.strip():
                         line = l.split(";")
-                        print(line
-                        )
+                        
                         if line[0]:
+                            print(line, padj_no, line[4].replace(',', '.'))
                             if "Species" in l:
                                 for e, i in enumerate(line):
                                     if i == "padj":
                                         padj_no = e
                                     
                         #print(padj_no, line, line[padj_no])
-                            elif float(line[padj_no].replace(',', '.'))< alfa:
+                            elif float(line[4].replace(',', '.'))< alfa:
                             
-                                tmp_ids.add(line[0].replace("OTU", ""))
+                                tmp_ids.add(int(line[1].replace("OTU", "").replace('"', '')))
+                                print(tmp_ids)
         main_taxids = list(tmp_ids)
+    print("main taxids", main_taxids)
     blast_files = eval(blast_files)
     print("read corr")
 
