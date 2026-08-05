@@ -106,10 +106,10 @@ def count_pearson_corr(metabolites):
             p_val_list.append((gene_name, correlation.pvalue))
         #calculate_q_val
         from statsmodels.stats.multitest import multipletests
-        reject, pvals_corrected, _, _ = multipletests([i[0] for i in p_val_list], alpha=0.05, method='fdr_bh')
+        reject, pvals_corrected, _, _ = multipletests([i[1] for i in p_val_list], alpha=0.05, method='fdr_bh')
         #add_q_val_to_dict
         for e, gene_pval_info in enumerate(p_val_list):
-            gene_name, p_val=gene_pval_info
+            p_val, gene_name=gene_pval_info
             tests[(metabolite, gene_name)]["qval_value"]-pvals_corrected[e]
             tests[(metabolite, gene_name)]["qval_significance"]-reject[e]
 
