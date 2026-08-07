@@ -99,8 +99,14 @@ def count_pearson_corr(metabolites):
                 if metabolites_sets[e] is not None and gene_no is not None:
                     metabolites_list.append(float(metabolites_sets[e]))
                     genes_no_list.append(float(gene_no))
+            # CPM
+            cpm = [i* 1e6 for i in genes_no_list]
+            
+            # log2(CPM+1)
+            log_cpm = np.log2(cpm + 1)
             #print(metabolites_list, genes_no_list)
-            correlation = pearsonr(metabolites_list, genes_no_list)
+            metabolites=np.log2(metabolites_list+1)
+            correlation = pearsonr(metabolites, log_cpm)
             tests[(metabolite, gene_name)] = {"metabo_values": metabolites_list, "gene_values": genes_no_list,
                                                  "pval": correlation.pvalue, "corr_value": correlation.statistic}
             p_val_list.append((gene_name, correlation.pvalue))
