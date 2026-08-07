@@ -103,6 +103,7 @@ def count_pearson_corr(metabolites):
             cpm = [i* 1e6 for i in genes_no_list]
             
             # log2(CPM)
+            import numpy as np
             log_cpm = np.log2(cpm)
             #print(metabolites_list, genes_no_list)
             metabolites=np.log2(metabolites_list)
