@@ -120,8 +120,15 @@ def count_pearson_corr(metabolites):
         pvals = [i[1] for i in p_val_list]
         
         # usunięcie nanów
-        valid = [(p, g) for p, g in p_val_list if not np.isnan(p)]
+        valid = []
         
+        for p, g in p_val_list:
+            try:
+                p = float(p)
+                if not np.isnan(p):
+                    valid.append((p, g))
+            except (ValueError, TypeError):
+                continue        
         pvals_valid = [x[0] for x in valid]
         
         reject, pvals_corrected, _, _ = multipletests(
