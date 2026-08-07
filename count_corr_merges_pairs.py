@@ -2,8 +2,9 @@ import os
 
 import click
 import numpy as np
-from scipy.stats import pearsonr
-
+from scipy.stats import pearsonr, spearmanr
+from statsmodels.stats.multitest import multipletests
+import numpy as np
 
 def read_stats_file(count_genes_file):
     file_names = list()
@@ -103,7 +104,7 @@ def count_pearson_corr(metabolites):
             cpm = [i* 1e6 for i in genes_no_list]
             
             # log2(CPM)
-            import numpy as np
+            
             log_cpm = np.log2(cpm)
             #print(metabolites_list, genes_no_list)
             metabolites=np.log2(metabolites_list)
@@ -112,8 +113,7 @@ def count_pearson_corr(metabolites):
                                                  "pval": correlation.pvalue, "corr_value": correlation.statistic}
             p_val_list.append((gene_name, correlation.pvalue))
         #calculate_q_val
-        from statsmodels.stats.multitest import multipletests
-        import numpy as np
+
         
         pvals = [i[1] for i in p_val_list]
         
