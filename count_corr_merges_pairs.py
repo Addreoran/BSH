@@ -101,13 +101,15 @@ def count_pearson_corr(metabolites):
                     metabolites_list.append(float(metabolites_sets[e]))
                     genes_no_list.append(float(gene_no))
             # CPM
+            
             cpm = [i* 1e6 for i in genes_no_list]
             
             # log2(CPM)
-            
-            log_cpm = np.log2(cpm)
+            cpm = np.array(cpm, dtype=float)
+            log_cpm = np.log2(cpm+1)
             #print(metabolites_list, genes_no_list)
-            metabolites=np.log2(metabolites_list)
+            metabolites = np.array(metabolites, dtype=float)
+            metabolites=np.log2(metabolites+1)
             correlation = spearmanr(metabolites, log_cpm)
             tests[(metabolite, gene_name)] = {"metabo_values": metabolites_list, "gene_values": genes_no_list,
                                                  "pval": correlation.pvalue, "corr_value": correlation.statistic}
