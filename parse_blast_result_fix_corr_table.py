@@ -346,9 +346,10 @@ def main(corr_file, corr_ctrl_file, blast_files, fasta_databases, out_file, main
     if selected_proteins:
         with open(selected_proteins) as f:
             for l in f:
-                line=l.strip().split()
-                uniprot_acc=line[0]
-                enzyme_proteins.add(uniprot_acc)
+                if not "Entry" in l:
+                    line=l.strip().split("\n")
+                    uniprot_acc=line[0]
+                    enzyme_proteins.add(uniprot_acc)
     print("main taxids", main_taxids)
     blast_files = eval(blast_files)
     print("read corr")
